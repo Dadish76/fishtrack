@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ "Редактировать" if crew else "Создать" }} команду{% endblock %}
+{% block content %}
+<h1>{{ "✏️ Редактировать" if crew else "➕ Создать" }} команду</h1>
+<form method="post" action="{{ '/web/crews/' + crew.id|string + '/edit' if crew else '/web/crews/new' }}">
+    <label>Капитан</label>
+    <input type="text" name="captain_name" required value="{{ crew.captain_name if crew else '' }}">
+
+    <label>Количество членов</label>
+    <input type="number" min="1" name="members_count" required value="{{ crew.members_count if crew else '' }}">
+
+    <button type="submit">💾 Сохранить</button>
+    <a href="/web/crews" style="margin-left: 15px;">Отмена</a>
+</form>
+{% endblock %}

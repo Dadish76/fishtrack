@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Создать рейс{% endblock %}
+{% block content %}
+<h1>➕ Создать рейс</h1>
+<form method="post" action="/web/trips/new">
+    <label>Катер</label>
+    <select name="boat_id" required>
+        {% for boat in boats %}
+        <option value="{{ boat.id }}">{{ boat.name }} ({{ boat.registration_number }})</option>
+        {% endfor %}
+    </select>
+
+    <label>Команда</label>
+    <select name="crew_id" required>
+        {% for crew in crews %}
+        <option value="{{ crew.id }}">{{ crew.captain_name }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Дата отправления</label>
+    <input type="datetime-local" name="departure_date" required>
+
+    <label>Дата возврата</label>
+    <input type="datetime-local" name="return_date" required>
+
+    <button type="submit">💾 Сохранить</button>
+    <a href="/web/trips" style="margin-left: 15px;">Отмена</a>
+</form>
+{% endblock %}

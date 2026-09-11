@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Рейсы{% endblock %}
+{% block content %}
+<h1>⛵ Рейсы</h1>
+<a href="/web/trips/new" class="btn btn-primary">+ Добавить рейс</a>
+<br><br>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Катер</th>
+        <th>Команда</th>
+        <th>Отправление</th>
+        <th>Возврат</th>
+        <th>Действия</th>
+    </tr>
+    {% for trip in trips %}
+    <tr>
+        <td>{{ trip.id }}</td>
+        <td>{{ trip.boat.name if trip.boat else "—" }}</td>
+        <td>{{ trip.crew.captain_name if trip.crew else "—" }}</td>
+        <td>{{ trip.departure_date }}</td>
+        <td>{{ trip.return_date or "—" }}</td>
+        <td>
+            <form action="/web/trips/{{ trip.id }}/delete" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger">🗑️</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

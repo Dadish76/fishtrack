@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Катера{% endblock %}
+{% block content %}
+<h1>🚢 Катера</h1>
+<a href="/web/boats/new" class="btn btn-primary">+ Добавить катер</a>
+<br><br>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Рег. номер</th>
+        <th>Вместимость</th>
+        <th>Действия</th>
+    </tr>
+    {% for boat in boats %}
+    <tr>
+        <td>{{ boat.id }}</td>
+        <td>{{ boat.name }}</td>
+        <td>{{ boat.registration_number }}</td>
+        <td>{{ boat.capacity }}</td>
+        <td>
+            <a href="/web/boats/{{ boat.id }}/edit" class="btn btn-warning">✏️</a>
+            <form action="/web/boats/{{ boat.id }}/delete" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger">🗑️</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
