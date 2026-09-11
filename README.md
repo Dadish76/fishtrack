@@ -6,7 +6,6 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-24+-blue?style=flat&logo=docker)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)](LICENSE)
 
 ---
 
@@ -52,18 +51,6 @@
 6. Рейс сохраняется
 
 ---
-
-## 📏 Обязательные правила работы
-
-| Правило | Где применяется | Результат нарушения |
-|---------|-----------------|---------------------|
-| Уникальность `registration_number` | При создании катера | 409 Conflict |
-| `capacity > 0` | Валидация схемы | 400 Bad Request |
-| `members_count > 0` | Валидация схемы | 400 Bad Request |
-| Существование `boat_id` | При создании рейса | 404 Not Found |
-| Существование `crew_id` | При создании рейса | 404 Not Found |
-| `return_date >= departure_date` | При создании рейса | 400 Bad Request |
-
 ## 🛠 Технологический стек
 
 | Компонент | Технология |
