@@ -1,41 +1,71 @@
-"""
-PYDANTIC СХЕМЫ
-DevB: Реализовать схемы для Boat, Crew, Trip
+from pydantic import BaseModel, Field, validator
+from datetime import datetime
+from typing import Optional
 
-Для каждой сущности нужно:
-1. Create схема (для POST запросов)
-2. Response схема (для GET ответов, с id)
+# Boat
+class BoatBase(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    registration_number: str = Field(..., min_length=3, max_length=20)
+    capacity: float = Field(..., gt=0)
 
-Подсказка: Используй BaseModel, Field, validator
-"""
+    @validator('capacity')
+    def capacity_positive(cls, v):
+        if v <= 0:
+            raise ValueError('Вместимость должна быть больше 0')
+        return v
 
-# from pydantic import BaseModel, Field, validator
-# from datetime import datetime
-# from typing import Optional
+class BoatCreate(BoatBase):
+    pass
 
-# TODO: Реализовать схему для Boat
-# class BoatCreate(BaseModel):
-#     ...
+class BoatUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    registration_number: Optional[str] = Field(None, min_length=3, max_length=20)
+    capacity: Optional[float] = Field(None, gt=0)
 
-# class BoatResponse(BoatCreate):
-#     id: int
-#     class Config:
-#         from_attributes = True
+class BoatResponse(BoatBase):
+    id: int
 
-# TODO: Реализовать схему для Crew
-# class CrewCreate(BaseModel):
-#     ...
+    class Config:
+        from_attributes = True
 
-# class CrewResponse(CrewCreate):
-#     id: int
-#     class Config:
-#         from_attributes = True
 
-# TODO: Реализовать схему для Trip
-# class TripCreate(BaseModel):
-#     ...
+# Crew
+class CrewBase(BaseModel):
+    captain_name: str = Field(..., min_length=1, max_length=100)
+    members_count: int = Field(..., gt=0)
 
-# class TripResponse(TripCreate):
-#     id: int
-#     class Config:
-#         from_attributes = True
+class CrewCreate(CrewBase):
+    pass
+
+class CrewUpdate(BaseModel):
+    captain_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    members_count: Optional[int] = Field(None, gt=0)
+
+class CrewResponse(CrewBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# Trip
+class TripBase(BaseModel):
+    boat_id: int
+    crew_id: int
+    departure_date: datetime
+    return_date: Optional[datetime] = None
+
+class TripCreate(TripBase):
+    pass
+
+class TripUpdate(BaseModel):
+    boat_id: Optional[int] = None
+    crew_id: Optional[int] = None
+    departure_date: Optional[datetime] = None
+    return_date: Optional[datetime] = None
+
+class TripResponse(TripBase):
+    id: int
+
+    class Config:
+        from_attributes = True
