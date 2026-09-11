@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ "Редактировать" if boat else "Создать" }} катер{% endblock %}
+{% block content %}
+<h1>{{ "✏️ Редактировать" if boat else "➕ Создать" }} катер</h1>
+<form method="post" action="{{ '/web/boats/' + boat.id|string + '/edit' if boat else '/web/boats/new' }}">
+    <label>Название</label>
+    <input type="text" name="name" required value="{{ boat.name if boat else '' }}">
+
+    <label>Регистрационный номер</label>
+    <input type="text" name="registration_number" required value="{{ boat.registration_number if boat else '' }}">
+
+    <label>Вместимость (тонн)</label>
+    <input type="number" step="0.1" min="0.1" name="capacity" required value="{{ boat.capacity if boat else '' }}">
+
+    <button type="submit">💾 Сохранить</button>
+    <a href="/web/boats" style="margin-left: 15px;">Отмена</a>
+</form>
+{% endblock %}
