@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -34,3 +34,12 @@ class Trip(Base):
 
     boat = relationship("Boat", back_populates="trips")
     crew = relationship("Crew", back_populates="trips")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False)

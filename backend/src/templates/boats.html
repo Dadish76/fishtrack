@@ -1,30 +1,41 @@
 {% extends "base.html" %}
 {% block title %}Катера{% endblock %}
 {% block content %}
-<h1>🚢 Катера</h1>
-<a href="/web/boats/new" class="btn btn-primary">+ Добавить катер</a>
-<br><br>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Название</th>
-        <th>Рег. номер</th>
-        <th>Вместимость</th>
-        <th>Действия</th>
-    </tr>
-    {% for boat in boats %}
-    <tr>
-        <td>{{ boat.id }}</td>
-        <td>{{ boat.name }}</td>
-        <td>{{ boat.registration_number }}</td>
-        <td>{{ boat.capacity }}</td>
-        <td>
-            <a href="/web/boats/{{ boat.id }}/edit" class="btn btn-warning">✏️</a>
-            <form action="/web/boats/{{ boat.id }}/delete" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-danger">🗑️</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>🚢 Катера</h1>
+    <a href="/web/boats/new" class="btn btn-primary">+ Добавить катер</a>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Рег. номер</th>
+                    <th>Вместимость</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for boat in boats %}
+                <tr>
+                    <td>{{ boat.id }}</td>
+                    <td><strong>{{ boat.name }}</strong></td>
+                    <td><code>{{ boat.registration_number }}</code></td>
+                    <td>{{ boat.capacity }} т</td>
+                    <td class="text-end">
+                        <a href="/web/boats/{{ boat.id }}/edit" class="btn btn-sm btn-warning">✏️</a>
+                        <form action="/web/boats/{{ boat.id }}/delete" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">Пока нет ни одного катера</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

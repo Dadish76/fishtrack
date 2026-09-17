@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 import os
+import bcrypt
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,6 +11,26 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+
+def hash_password(password: str) -> str:
+    """Хеширует пароль через bcrypt."""
+    # bcrypt требует bytes, ограничиваем 72 байтами
+    password_bytes = password.encode("utf-8")[:72]
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password_bytes, salt).decode("utf-8")
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    """Проверяет пароль."""
+    try:
+        return bcrypt.checkpw(
+            plain.encode("utf-8")[:72],
+            hashed.encode("utf-8")
+        )
+    except Exception:
+        return False
+
 
 def get_db():
     db = SessionLocal()
