@@ -1,11 +1,36 @@
 {% extends "base.html" %}
 {% block title %}FishTrack — Главная{% endblock %}
 {% block content %}
-<h1>🐟 FishTrack</h1>
-<p>Система учёта рыболовной фирмы</p>
-<ul>
-    <li><a href="/web/boats">Управление катерами</a></li>
-    <li><a href="/web/crews">Управление командами</a></li>
-    <li><a href="/web/trips">Управление рейсами</a></li>
-</ul>
+<h1>🐟 Добро пожаловать, {{ user.username }}!</h1>
+<p class="text-muted mb-4">Система учёта рыболовной фирмы</p>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <a href="/web/boats" class="text-decoration-none">
+            <div class="stat-card text-center">
+                <div class="icon">🚢</div>
+                <div class="value">Катера</div>
+                <div class="label">Управление плавсредствами</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="/web/crews" class="text-decoration-none">
+            <div class="stat-card text-center">
+                <div class="icon">👨‍✈️</div>
+                <div class="value">Команды</div>
+                <div class="label">Экипажи и капитаны</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="/web/trips" class="text-decoration-none">
+            <div class="stat-card text-center">
+                <div class="icon">⛵</div>
+                <div class="value">Рейсы</div>
+                <div class="label">Выходы в море</div>
+            </div>
+        </a>
+    </div>
+</div>
 {% endblock %}
