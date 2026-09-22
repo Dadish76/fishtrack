@@ -14,8 +14,5 @@ class Settings(BaseSettings):
     DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
     PORT: int = int(os.getenv("PORT", "8000"))
 
-    class Config:
-        env_file = ".env"
-
 
 settings = Settings()
