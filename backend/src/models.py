@@ -9,7 +9,7 @@ class Boat(Base):
     name = Column(String, nullable=False)
     registration_number = Column(String, unique=True, nullable=False, index=True)
     capacity = Column(Float, nullable=False)
-
+    year_built = Column(Integer, nullable=True)
     trips = relationship("Trip", back_populates="boat")
 
 
