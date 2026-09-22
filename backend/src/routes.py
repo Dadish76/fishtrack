@@ -119,23 +119,27 @@ def get_trip(trip_id: int, db: Session = Depends(get_db)):
 
 @router.post("/trips", response_model=TripResponse, status_code=status.HTTP_201_CREATED)
 def create_trip(trip: TripCreate, db: Session = Depends(get_db)):
-    # Проверяем, что катер существует
+    # Проверяем катер
     boat = db.query(Boat).filter(Boat.id == trip.boat_id).first()
     if not boat:
-        raise HTTPException(status_code=404, detail="Катер с таким ID не найден")
+        raise HTTPException(status_code=404, detail="Катер не найден")
 
-    # Проверяем, что команда существует
+    # Проверяем команду
     crew = db.query(Crew).filter(Crew.id == trip.crew_id).first()
     if not crew:
-        raise HTTPException(status_code=404, detail="Команда с таким ID не найдена")
+        raise HTTPException(status_code=404, detail="Команда не найдена")
 
-    # Создаём рейс
+    if trip.return_date and trip.return_date < trip.departure_date:
+        raise HTTPException(
+            status_code=400,
+            detail="Дата возврата не может быть раньше даты отправления"
+        )
+
     db_trip = Trip(**trip.dict())
     db.add(db_trip)
     db.commit()
     db.refresh(db_trip)
     return db_trip
-
 
 @router.put("/trips/{trip_id}", response_model=TripResponse)
 def update_trip(trip_id: int, trip: TripUpdate, db: Session = Depends(get_db)):
