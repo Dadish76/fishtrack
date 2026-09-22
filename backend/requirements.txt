@@ -8,3 +8,5 @@ httpx
 jinja2
 python-multipart
 pydantic-settings
+bcrypt
+itsdangerous
