@@ -1,14 +1,16 @@
+import os
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from backend.src.main import app
+
 from backend.src.database import Base, get_db
-import os
+from backend.src.main import app
 
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql://fishtrack_user:strong_password_123@192.168.56.20:5432/fishtrack_test"
+    "postgresql://fishtrack_user:strong_password_123@192.168.56.20:5432/fishtrack_test",
 )
 
 engine = create_engine(TEST_DATABASE_URL)

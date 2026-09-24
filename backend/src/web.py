@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Request, Depends, Form, HTTPException
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from datetime import datetime
-from .database import get_db, hash_password, SessionLocal
-from .models import Boat, Crew, Trip, User
-from .auth import login_user, create_session_token, get_current_user
+
+from .auth import create_session_token, get_current_user, login_user
+from .database import get_db
+from .models import Boat, Crew, Trip
 
 router = APIRouter()
 templates = Jinja2Templates(directory="backend/src/templates")
@@ -18,6 +20,7 @@ def login_page(request: Request):
 
 @router.post("/login")
 def login(
+    request: Request,
     username: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db),
@@ -52,6 +55,7 @@ def current_user(request: Request, db: Session):
 # ГЛАВНАЯ
 # ============================================
 
+
 @router.get("/", response_class=HTMLResponse)
 def index(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
@@ -65,6 +69,7 @@ def index(request: Request, db: Session = Depends(get_db)):
 # ============================================
 # BOAT
 # ============================================
+
 
 @router.get("/web/boats", response_class=HTMLResponse)
 def web_boats(request: Request, db: Session = Depends(get_db)):
@@ -100,9 +105,7 @@ def web_boat_create(
     db: Session = Depends(get_db),
 ):
     existing = (
-        db.query(Boat)
-        .filter(Boat.registration_number == registration_number)
-        .first()
+        db.query(Boat).filter(Boat.registration_number == registration_number).first()
     )
     if existing:
         raise HTTPException(
@@ -115,9 +118,7 @@ def web_boat_create(
 
 
 @router.get("/web/boats/{boat_id}/edit", response_class=HTMLResponse)
-def web_boat_edit(
-    boat_id: int, request: Request, db: Session = Depends(get_db)
-):
+def web_boat_edit(boat_id: int, request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/login", status_code=303)
@@ -163,6 +164,7 @@ def web_boat_delete(boat_id: int, db: Session = Depends(get_db)):
 # CREW
 # ============================================
 
+
 @router.get("/web/crews", response_class=HTMLResponse)
 def web_crews(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
@@ -201,9 +203,7 @@ def web_crew_create(
 
 
 @router.get("/web/crews/{crew_id}/edit", response_class=HTMLResponse)
-def web_crew_edit(
-    crew_id: int, request: Request, db: Session = Depends(get_db)
-):
+def web_crew_edit(crew_id: int, request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/login", status_code=303)
@@ -246,6 +246,7 @@ def web_crew_delete(crew_id: int, db: Session = Depends(get_db)):
 # ============================================
 # TRIP
 # ============================================
+
 
 @router.get("/web/trips", response_class=HTMLResponse)
 def web_trips(request: Request, db: Session = Depends(get_db)):

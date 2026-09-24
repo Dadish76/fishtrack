@@ -1,6 +1,7 @@
 import pytest
 from pydantic import ValidationError
-from backend.src.schemas import BoatCreate, CrewCreate, TripCreate
+
+from backend.src.schemas import BoatCreate, CrewCreate
 
 
 # BOAT

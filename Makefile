@@ -25,8 +25,8 @@ setup:
 	@echo "→ Установка зависимостей..."
 	./venv/bin/pip install --upgrade pip
 	./venv/bin/pip install -r backend/requirements-dev.txt
-	@echo "→ Запуск БД через Docker..."
-	docker-compose up -d db
+	#@echo "→ Запуск БД через Docker..."
+	#docker-compose up -d db
 	@echo "✅ Setup завершён"
 
 # ============================================
@@ -42,7 +42,7 @@ lint:
 	@echo "→ black проверяет форматирование..."
 	./venv/bin/black backend/src/ backend/tests/ --check
 	@echo "→ ruff проверяет код..."
-	./venv/bin/ruff check backend/src/ backend/tests/
+	./venv/bin/ruff check backend/src/ backend/tests/ --config pyproject.toml
 
 # ============================================
 # SAST
@@ -74,13 +74,24 @@ migrate-create:
 # ============================================
 # BACKUP / RESTORE
 # ============================================
+
 backup:
 	@mkdir -p backups
-	docker exec fishtrack_db pg_dump -U user fishtrack > backups/backup_$$(date +%Y%m%d_%H%M%S).sql
-	@echo "✅ Бэкап создан"
+	@echo "→ Создание бэкапа..."
+	PGPASSWORD=$${DB_PASSWORD} pg_dump \
+		-h 192.168.56.20 \
+		-U fishtrack_user \
+		-d fishtrack \
+		> backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+	@echo "✅ Бэкап создан в backups/"
 
 restore:
-	docker exec -i fishtrack_db psql -U user fishtrack < $(file)
+	@echo "→ Восстановление из $(file)..."
+	PGPASSWORD=$${DB_PASSWORD} psql \
+		-h 192.168.56.20 \
+		-U fishtrack_user \
+		-d fishtrack \
+		< backups/$(file)
 	@echo "✅ Бэкап восстановлен"
 
 # ============================================
