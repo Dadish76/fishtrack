@@ -1,7 +1,9 @@
 from typing import Optional
+
 from fastapi import Request
 from itsdangerous import URLSafeSerializer
 from sqlalchemy.orm import Session
+
 from .database import verify_password
 from .models import User
 
