@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from fastapi import Request
@@ -7,7 +8,7 @@ from sqlalchemy.orm import Session
 from .database import verify_password
 from .models import User
 
-SECRET_KEY = "change-me-in-production"
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-in-production")
 serializer = URLSafeSerializer(SECRET_KEY)
 
 
