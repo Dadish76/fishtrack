@@ -8,9 +8,12 @@ from sqlalchemy.orm import Session
 from .auth import create_session_token, get_current_user, login_user
 from .database import get_db
 from .models import Boat, Crew, Trip
+from pathlib import Path
 
 router = APIRouter()
-templates = Jinja2Templates(directory="backend/src/templates")
+templates = Jinja2Templates(
+    directory=str(Path(__file__).resolve().parent / "templates")
+)
 
 
 @router.get("/login", response_class=HTMLResponse)
