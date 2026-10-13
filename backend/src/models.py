@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Boolean
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
 from .database import Base
+
 
 class Boat(Base):
     __tablename__ = "boats"
@@ -9,7 +11,7 @@ class Boat(Base):
     name = Column(String, nullable=False)
     registration_number = Column(String, unique=True, nullable=False, index=True)
     capacity = Column(Float, nullable=False)
-
+    year_built = Column(Integer, nullable=True)
     trips = relationship("Trip", back_populates="boat")
 
 
