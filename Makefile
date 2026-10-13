@@ -49,7 +49,7 @@ lint:
 # ============================================
 sast:
 	@echo "→ bandit проверяет безопасность..."
-	./venv/bin/bandit -r backend/src/ -ll
+	./venv/bin/bandit -r backend/src/ -f screen
 
 # ============================================
 # TEST
