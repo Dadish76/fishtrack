@@ -4,13 +4,10 @@ from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from .database import Base, SessionLocal, engine, hash_password
+from .database import SessionLocal, hash_password
 from .models import User
 from .routes import router as api_router
 from .web import router as web_router
-
-# Создать таблицы
-Base.metadata.create_all(bind=engine)
 
 
 def create_default_admin():
