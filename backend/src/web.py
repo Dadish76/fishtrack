@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -8,7 +9,6 @@ from sqlalchemy.orm import Session
 from .auth import create_session_token, get_current_user, login_user
 from .database import get_db
 from .models import Boat, Crew, Trip
-from pathlib import Path
 
 router = APIRouter()
 templates = Jinja2Templates(

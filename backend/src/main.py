@@ -1,10 +1,12 @@
 import os
 from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
 from .routes import router as api_router
 from .web import router as web_router
 
@@ -14,9 +16,7 @@ app = FastAPI(title="FishTrack API", version="0.1.0")
 @app.middleware("http")
 async def add_instance_header(request: Request, call_next):
     response = await call_next(request)
-    response.headers["X-Instance-ID"] = os.getenv(
-        "INSTANCE_ID", "unknown"
-    )
+    response.headers["X-Instance-ID"] = os.getenv("INSTANCE_ID", "unknown")
     return response
 
 

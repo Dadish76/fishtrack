@@ -1,4 +1,3 @@
-
 import os
 
 from sqlalchemy.dialects.postgresql import insert
@@ -11,9 +10,7 @@ def main():
     password = os.environ.get("ADMIN_PASSWORD", "")
 
     if len(password) < 12:
-        raise SystemExit(
-            "ADMIN_PASSWORD must contain at least 12 characters"
-        )
+        raise SystemExit("ADMIN_PASSWORD must contain at least 12 characters")
 
     with SessionLocal() as db:
         statement = (
@@ -23,9 +20,7 @@ def main():
                 hashed_password=hash_password(password),
                 is_admin=True,
             )
-            .on_conflict_do_nothing(
-                index_elements=[User.username]
-            )
+            .on_conflict_do_nothing(index_elements=[User.username])
         )
 
         result = db.execute(statement)
