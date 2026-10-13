@@ -37,6 +37,6 @@ Thumbs.db
 # Бэкапы БД
 backups/*.sql
 !backups/.gitkeep
-
+backups/
 
 .env.container
