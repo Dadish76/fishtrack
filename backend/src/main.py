@@ -1,40 +1,31 @@
+import os
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
-from .database import SessionLocal, hash_password
-from .models import User
 from .routes import router as api_router
 from .web import router as web_router
 
-
-def create_default_admin():
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.username == "admin").first()
-        if not user:
-            admin = User(
-                username="admin",
-                hashed_password=hash_password("admin"),
-                is_admin=True,
-            )
-            db.add(admin)
-            db.commit()
-            print("✅ Создан пользователь admin/admin")
-    finally:
-        db.close()
-
-
-create_default_admin()
-
 app = FastAPI(title="FishTrack API", version="0.1.0")
+
+
+@app.middleware("http")
+async def add_instance_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Instance-ID"] = os.getenv(
+        "INSTANCE_ID", "unknown"
+    )
+    return response
+
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(web_router)
 
-templates = Jinja2Templates(directory="backend/src/templates")
+templates = Jinja2Templates(
+    directory=str(Path(__file__).resolve().parent / "templates")
+)
 
 
 @app.get("/health")
