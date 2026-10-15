@@ -1,14 +1,12 @@
 FROM python:3.11.10-slim-bookworm
 
-WORKDIR /app
+COPY --chown=10001:10001 backend/ /app/
 
-COPY backend/requirements.txt ./requirements.txt
-
-RUN pip install --no-cache-dir -r requirements.txt \
+RUN pip install --no-cache-dir -r /app/requirements.txt \
     && groupadd -g 10001 appgroup \
     && useradd -u 10001 -g appgroup -M appuser
 
-COPY --chown=appuser:appgroup backend/ /app/
+WORKDIR /app
 
 USER appuser
 
