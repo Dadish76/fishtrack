@@ -35,6 +35,8 @@ htmlcov/
 Thumbs.db
 
 # Бэкапы БД
-backups/*.sql
+backups/*
 !backups/.gitkeep
+
+# Секреты Docker
 .env.container

@@ -109,3 +109,9 @@ clean:
 	rm -rf .pytest_cache .coverage htmlcov .ruff_cache
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	@echo "✅ Временные файлы удалены"
+
+# ============================================
+# CONTAINER-CHECK
+# ============================================
+container-check:
+	python scripts/container_check.py
