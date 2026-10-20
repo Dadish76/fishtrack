@@ -8,10 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from backend.src.database import Base, get_db
 from backend.src.main import app
 
-TEST_DATABASE_URL = os.getenv(
-    "TEST_DATABASE_URL",
-    "postgresql://fishtrack_user:strong_password_123@192.168.56.20:5432/fishtrack_test",
-)
+TEST_DATABASE_URL = os.environ["TEST_DATABASE_URL"]
 
 engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
