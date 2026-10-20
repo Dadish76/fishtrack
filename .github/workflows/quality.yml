@@ -284,3 +284,50 @@ jobs:
           name: backup-reports
           path: reports/
           if-no-files-found: ignore
+  # ==========================================
+  # 5. SECURITY
+  # ==========================================
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+
+      - name: Install pip-audit
+        run: python -m pip install pip-audit
+
+      - name: Check Python dependencies
+        run: |
+          mkdir -p reports
+          python -m pip_audit \
+            -r backend/requirements.txt \
+            --format json \
+            --output reports/pip-audit.json
+
+      - name: Scan repository for secrets
+        if: success() || failure()
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: security-reports
+          path: reports/
+          if-no-files-found: ignore
+
