@@ -70,9 +70,11 @@ jobs:
 
     env:
       DATABASE_URL: postgresql+psycopg2://fishtrack_test:fishtrack_test_ci@127.0.0.1:5432/fishtrack_test
+      TEST_DATABASE_URL: postgresql+psycopg2://fishtrack_test:fishtrack_test_ci@127.0.0.1:5432/fishtrack_test
       SECRET_KEY: ci-only-test-secret-key
       ADMIN_PASSWORD: ci-only-test-password
-      PYTEST_ADDOPTS: "--junitxml=reports/pytest.xml --cov-report=xml:reports/coverage.xml"
+      PGCONNECT_TIMEOUT: "5"
+      PYTEST_ADDOPTS: "--maxfail=1 --tb=short --junitxml=reports/pytest.xml --cov-report=xml:reports/coverage.xml"
 
     steps:
       - name: Checkout
