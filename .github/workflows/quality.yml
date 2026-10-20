@@ -2,8 +2,6 @@
 name: FishTrack Quality
 
 on:
-  push:
-  pull_request:
   workflow_call:
 
 permissions:
