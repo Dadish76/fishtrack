@@ -1,0 +1,244 @@
+
+name: FishTrack CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # ==========================================
+  # 1. ПРОВЕРКИ DEVA
+  # ==========================================
+  quality:
+    name: Quality
+    uses: ./.github/workflows/quality.yml
+    permissions:
+      contents: read
+      pull-requests: read
+
+  # ==========================================
+  # 2. ПРОВЕРКА DOCKER COMPOSE
+  # ==========================================
+  container_check:
+    name: Container Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare CI environment
+        shell: bash
+        env:
+          CI_POSTGRES_PASSWORD: ${{ secrets.CI_POSTGRES_PASSWORD }}
+          CI_SECRET_KEY: ${{ secrets.CI_SECRET_KEY }}
+          CI_ADMIN_PASSWORD: ${{ secrets.CI_ADMIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          : "${CI_POSTGRES_PASSWORD:?Missing CI_POSTGRES_PASSWORD}"
+          : "${CI_SECRET_KEY:?Missing CI_SECRET_KEY}"
+          : "${CI_ADMIN_PASSWORD:?Missing CI_ADMIN_PASSWORD}"
+
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from urllib.parse import quote
+
+          password = os.environ["CI_POSTGRES_PASSWORD"]
+
+          lines = [
+              "POSTGRES_USER=fishtrack_user",
+              f"POSTGRES_PASSWORD={password}",
+              f"POSTGRES_PASSWORD_URLENCODED={quote(password, safe='')}",
+              "POSTGRES_DB=fishtrack",
+              f"SECRET_KEY={os.environ['CI_SECRET_KEY']}",
+              f"ADMIN_PASSWORD={os.environ['CI_ADMIN_PASSWORD']}",
+          ]
+
+          Path(".env.container").write_text(
+              "\n".join(lines) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Validate Docker Compose
+        run: |
+          docker compose \
+            --env-file .env.container \
+            config --quiet
+
+      - name: Run container checks
+        shell: bash
+        run: |
+          mkdir -p reports
+          set -o pipefail
+          make container-check \
+            2>&1 | tee reports/container-check.log
+
+      - name: Upload container report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: container-check-report
+          path: reports/
+          if-no-files-found: ignore
+
+      - name: Stop test containers
+        if: always()
+        shell: bash
+        run: |
+          if [ -f .env.container ]; then
+            docker compose \
+              --env-file .env.container \
+              down --remove-orphans || true
+          fi
+
+  # ==========================================
+  # 3. DOCKER BUILD
+  # ==========================================
+  build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+
+    needs:
+      - quality
+      - container_check
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker build \
+            --label "org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}" \
+            -t "fishtrack:ci-${GITHUB_SHA}" \
+            .
+
+      - name: Export image
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+
+          docker save "fishtrack:ci-${GITHUB_SHA}" \
+            | gzip -1 > artifacts/fishtrack.tar.gz
+
+      - name: Upload Docker image
+        uses: actions/upload-artifact@v7
+        with:
+          name: fishtrack-image-${{ github.sha }}
+          path: artifacts/fishtrack.tar.gz
+          retention-days: 3
+
+  # ==========================================
+  # 4. TRIVY IMAGE SCAN
+  # ==========================================
+  image_scan:
+    name: Trivy Image Scan
+    runs-on: ubuntu-latest
+
+    needs:
+      - build
+
+    steps:
+      - name: Download image
+        uses: actions/download-artifact@v7
+        with:
+          name: fishtrack-image-${{ github.sha }}
+          path: artifacts
+
+      - name: Load image
+        shell: bash
+        run: |
+          set -euo pipefail
+          gzip -dc artifacts/fishtrack.tar.gz \
+            | docker load
+
+      - name: Scan Docker image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: image
+          image-ref: fishtrack:ci-${{ github.sha }}
+          format: table
+          output: trivy-report.txt
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          exit-code: "1"
+
+      - name: Upload Trivy report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: trivy-report-${{ github.sha }}
+          path: trivy-report.txt
+          if-no-files-found: ignore
+
+  # ==========================================
+  # 5. PUBLISH TO GHCR
+  # ==========================================
+  publish:
+    name: Publish to GHCR
+    runs-on: ubuntu-latest
+
+    needs:
+      - quality
+      - container_check
+      - build
+      - image_scan
+
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/develop'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Download verified image
+        uses: actions/download-artifact@v7
+        with:
+          name: fishtrack-image-${{ github.sha }}
+          path: artifacts
+
+      - name: Load verified image
+        shell: bash
+        run: |
+          set -euo pipefail
+          gzip -dc artifacts/fishtrack.tar.gz \
+            | docker load
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Docker image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REPOSITORY=$(echo "$GITHUB_REPOSITORY" \
+            | tr '[:upper:]' '[:lower:]')
+
+          IMAGE="ghcr.io/${REPOSITORY}:sha-${GITHUB_SHA}"
+
+          docker tag "fishtrack:ci-${GITHUB_SHA}" "$IMAGE"
+          docker push "$IMAGE"
+
+          echo "Published image: $IMAGE"
