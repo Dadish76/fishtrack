@@ -1,10 +1,14 @@
-FROM python:3.11.10-slim-bookworm
+FROM python:3.11-slim-bookworm
 
 COPY --chown=10001:10001 backend/ /app/
 
-RUN pip install --no-cache-dir -r /app/requirements.txt \
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && python -m pip install --no-cache-dir --upgrade setuptools wheel \
+    && python -m pip install --no-cache-dir -r /app/requirements.txt \
     && groupadd -g 10001 appgroup \
-    && useradd -u 10001 -g appgroup -M appuser
+    && useradd -u 10001 -g appgroup -M appuser \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
