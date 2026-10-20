@@ -183,6 +183,7 @@ jobs:
           name: migration-reports
           path: reports/
           if-no-files-found: ignore
+
   # ==========================================
   # 4. BACKUP AND RESTORE
   # ==========================================
@@ -284,12 +285,17 @@ jobs:
           name: backup-reports
           path: reports/
           if-no-files-found: ignore
+
   # ==========================================
   # 5. SECURITY
   # ==========================================
   security:
     name: Security
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
 
     steps:
       - name: Checkout
@@ -322,6 +328,7 @@ jobs:
         uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
 
       - name: Upload security reports
         if: always()
@@ -330,4 +337,3 @@ jobs:
           name: security-reports
           path: reports/
           if-no-files-found: ignore
-
