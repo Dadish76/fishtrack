@@ -1,0 +1,28 @@
+# Все настройки GitHub, включая CI и CODEOWNERS
+/.github/ @Dadish76
+
+# Тесты приложения
+/backend/tests/ @Dadish76
+
+# Команды локальных проверок
+/Makefile @Dadish76
+
+# Конфигурации анализаторов
+/pyproject.toml @Dadish76
+/backend/pyproject.toml @Dadish76
+
+# Зависимости приложения
+/backend/requirements.txt @Dadish76
+/backend/requirements-dev.txt @Dadish76
+
+# Миграции
+/backend/migrations/ @Dadish76
+
+# Скрипты проверок
+/scripts/ @Dadish76
+
+# Docker
+/Dockerfile @Dadish76
+/docker-compose.yml @Dadish76
+/.dockerignore @Dadish76
+/nginx/ @Dadish76
