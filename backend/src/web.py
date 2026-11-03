@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -10,7 +11,9 @@ from .database import get_db
 from .models import Boat, Crew, Trip
 
 router = APIRouter()
-templates = Jinja2Templates(directory="backend/src/templates")
+templates = Jinja2Templates(
+    directory=str(Path(__file__).resolve().parent / "templates")
+)
 
 
 @router.get("/login", response_class=HTMLResponse)
