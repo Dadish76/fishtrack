@@ -1,28 +1,22 @@
-# Все настройки GitHub, включая CI и CODEOWNERS
+# Владельцы критических файлов FishTrack
+
+# GitHub Actions и правила CODEOWNERS
 /.github/ @Dadish76
 
-# Тесты приложения
+# Автоматические тесты
 /backend/tests/ @Dadish76
 
-# Команды локальных проверок
+# Миграции и настройки
+/backend/migrations/ @Dadish76
 /Makefile @Dadish76
-
-# Конфигурации анализаторов
 /pyproject.toml @Dadish76
-/backend/pyproject.toml @Dadish76
 
-# Зависимости приложения
+# Зависимости
 /backend/requirements.txt @Dadish76
 /backend/requirements-dev.txt @Dadish76
 
-# Миграции
-/backend/migrations/ @Dadish76
-
-# Скрипты проверок
-/scripts/ @Dadish76
-
-# Docker
+# Docker и инфраструктура
 /Dockerfile @Dadish76
 /docker-compose.yml @Dadish76
-/.dockerignore @Dadish76
+/scripts/ @Dadish76
 /nginx/ @Dadish76
