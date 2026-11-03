@@ -1,5 +1,5 @@
 # Все настройки GitHub, включая CI и CODEOWNERS
-/.github/ @Dadish76
+/.github/ @Dadish76 @f1stle
 
 # Тесты приложения
 /backend/tests/ @Dadish76
@@ -19,7 +19,7 @@
 /backend/migrations/ @Dadish76
 
 # Скрипты проверок
-/scripts/ @Dadish76
+/scripts/ @Dadish76 @f1stle
 
 # Docker
 /Dockerfile @Dadish76
