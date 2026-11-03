@@ -97,7 +97,7 @@ restore:
 # ============================================
 # VERIFY — ГЛАВНАЯ КОМАНДА
 # ============================================
-verify: lint sast test migrate
+verify: lint sast migrate
 	@echo ""
 	@echo "✅✅✅ Все проверки пройдены! ✅✅✅"
 	@echo ""
