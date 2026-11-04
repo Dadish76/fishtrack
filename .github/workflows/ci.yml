@@ -13,19 +13,17 @@ permissions:
   pull-requests: read
 
 jobs:
-  # ==========================================
-  # 1. ПРОВЕРКИ DEVA
-  # ==========================================
+  # 1. Проверки качества из существующего reusable workflow
   quality:
     name: Quality
     uses: ./.github/workflows/quality.yml
+    secrets: inherit
     permissions:
       contents: read
       pull-requests: read
+      security-events: write
 
-  # ==========================================
-  # 2. ПРОВЕРКА DOCKER COMPOSE
-  # ==========================================
+  # 2. Проверка Docker Compose и запуска контейнеров
   container_check:
     name: Container Check
     runs-on: ubuntu-latest
@@ -71,6 +69,7 @@ jobs:
           PY
 
       - name: Validate Docker Compose
+        shell: bash
         run: |
           docker compose \
             --env-file .env.container \
@@ -79,10 +78,9 @@ jobs:
       - name: Run container checks
         shell: bash
         run: |
+          set -euo pipefail
           mkdir -p reports
-          set -o pipefail
-          make container-check \
-            2>&1 | tee reports/container-check.log
+          make container-check 2>&1 | tee reports/container-check.log
 
       - name: Upload container report
         if: always()
@@ -102,13 +100,10 @@ jobs:
               down --remove-orphans || true
           fi
 
-  # ==========================================
-  # 3. DOCKER BUILD
-  # ==========================================
+  # 3. Сборка образа (только в CI, не на staging)
   build:
     name: Docker Build
     runs-on: ubuntu-latest
-
     needs:
       - quality
       - container_check
@@ -121,7 +116,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           docker build \
             --label "org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}" \
             -t "fishtrack:ci-${GITHUB_SHA}" \
@@ -132,7 +126,6 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts
-
           docker save "fishtrack:ci-${GITHUB_SHA}" \
             | gzip -1 > artifacts/fishtrack.tar.gz
 
@@ -141,21 +134,19 @@ jobs:
         with:
           name: fishtrack-image-${{ github.sha }}
           path: artifacts/fishtrack.tar.gz
+          if-no-files-found: error
           retention-days: 3
 
-  # ==========================================
-  # 4. TRIVY IMAGE SCAN
-  # ==========================================
+  # 4. Проверка собранного образа Trivy
   image_scan:
     name: Trivy Image Scan
     runs-on: ubuntu-latest
-
     needs:
       - build
 
     steps:
       - name: Download image
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: fishtrack-image-${{ github.sha }}
           path: artifacts
@@ -164,8 +155,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gzip -dc artifacts/fishtrack.tar.gz \
-            | docker load
+          gzip -dc artifacts/fishtrack.tar.gz | docker load
 
       - name: Scan Docker image
         uses: aquasecurity/trivy-action@v0.36.0
@@ -187,13 +177,10 @@ jobs:
           path: trivy-report.txt
           if-no-files-found: ignore
 
-  # ==========================================
-  # 5. PUBLISH TO GHCR
-  # ==========================================
+  # 5. Публикация проверенного образа в GHCR только из develop
   publish:
     name: Publish to GHCR
     runs-on: ubuntu-latest
-
     needs:
       - quality
       - container_check
@@ -210,7 +197,7 @@ jobs:
 
     steps:
       - name: Download verified image
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: fishtrack-image-${{ github.sha }}
           path: artifacts
@@ -219,8 +206,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gzip -dc artifacts/fishtrack.tar.gz \
-            | docker load
+          gzip -dc artifacts/fishtrack.tar.gz | docker load
 
       - name: Login to GHCR
         uses: docker/login-action@v4
@@ -233,13 +219,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           REPOSITORY=$(echo "$GITHUB_REPOSITORY" \
             | tr '[:upper:]' '[:lower:]')
-
           IMAGE="ghcr.io/${REPOSITORY}:sha-${GITHUB_SHA}"
-
           docker tag "fishtrack:ci-${GITHUB_SHA}" "$IMAGE"
           docker push "$IMAGE"
-
           echo "Published image: $IMAGE"
+
+  # 6. После успешного CI -> CD на self-hosted runner
+  deploy_staging:
+    name: Deploy to staging
+    needs:
+      - publish
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/develop' &&
+      github.repository == 'Dadish76/fishtrack'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/deploy.yml
