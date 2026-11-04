@@ -12,6 +12,12 @@ from .web import router as web_router
 
 app = FastAPI(title="FishTrack API", version="0.1.0")
 
+@app.get("/version", tags=["system"])
+def get_version():
+    return {
+        "app": "fishtrack",
+        "version": os.getenv("IMAGE_TAG", "unknown"),
+    }
 
 @app.middleware("http")
 async def add_instance_header(request: Request, call_next):
