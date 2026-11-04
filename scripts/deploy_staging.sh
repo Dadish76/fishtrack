@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
@@ -14,6 +13,8 @@ if [[ ! "$IMAGE_TAG" =~ ^sha-[0-9a-f]{40}$ ]] &&
 fi
 
 export IMAGE_TAG
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 STAGING_DIR="/opt/fishtrack-staging"
 
@@ -54,27 +55,27 @@ echo "Image tag: $IMAGE_TAG"
 echo "===================================="
 
 # 1. Проверяем настройки
-echo "[1/6] Checking configuration"
+echo "[1/7] Checking configuration"
 dc config -q
 
 # 2. Получаем готовый образ из Registry
-echo "[2/6] Pulling Docker image"
+echo "[2/7] Pulling Docker image"
 dc pull app1 app2
 
 # 3. Проверяем готовность PostgreSQL
-echo "[3/6] Starting staging database"
+echo "[3/7] Starting staging database"
 dc up -d --no-build --wait db
 
 # 4. Применяем миграции
-echo "[4/6] Applying Alembic migrations"
+echo "[4/7] Applying Alembic migrations"
 dc run --rm migrate
 
 # 5. Обновляем контейнеры
-echo "[5/6] Starting application and Nginx"
+echo "[5/7] Starting application and Nginx"
 dc up -d --no-build --wait --wait-timeout 180 app1 app2 nginx
 
 # 6. Базовые проверки доступности
-echo "[6/6] Checking HTTP endpoints"
+echo "[6/7] Checking HTTP endpoints"
 
 curl \
   --fail \
@@ -96,6 +97,15 @@ curl \
   > /dev/null
 
 echo "HTTP checks passed"
+
+# 7. Проверяем версию и пользовательский сценарий
+echo "[7/7] Running FishTrack smoke tests"
+
+python3 "${SCRIPT_DIR}/smoke_test.py" \
+  --base-url "http://127.0.0.1:8081" \
+  --expected-tag "$IMAGE_TAG"
+
+echo "Smoke tests passed"
 
 # Сохраняем предыдущий тег для ручного отката
 PREVIOUS_TAG="$(sed -n 's/^IMAGE_TAG=//p' .env.staging | head -n 1)"
