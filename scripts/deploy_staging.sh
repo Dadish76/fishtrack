@@ -103,7 +103,8 @@ echo "[7/7] Running FishTrack smoke tests"
 
 python3 "${SCRIPT_DIR}/smoke_test.py" \
   --base-url "http://127.0.0.1:8081" \
-  --expected-tag "$IMAGE_TAG"
+  --expected-tag "$IMAGE_TAG" \
+  --boat-payload-file "${SCRIPT_DIR}/smoke_boat.json"
 
 echo "Smoke tests passed"
 
@@ -140,5 +141,5 @@ trap - EXIT
 echo "===================================="
 echo "Staging updated: $IMAGE_TAG"
 echo "Basic HTTP checks passed"
-echo "Full smoke-test acceptance is pending"
+echo "Release smoke tests passed"
 echo "===================================="
