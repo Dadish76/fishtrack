@@ -28,6 +28,21 @@ async def add_instance_header(request: Request, call_next):
     return response
 
 
+@app.middleware("http")
+async def lab6_demo_broken_boat_creation(request: Request, call_next):
+    if (
+        request.method == "POST"
+        and request.url.path == "/api/v1/boats"
+        and os.getenv("IMAGE_TAG", "").startswith("sha-")
+    ):
+        return JSONResponse(
+            status_code=503,
+            content={"detail": "Lab6 demo: boat creation unavailable"},
+        )
+
+    return await call_next(request)
+
+
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(web_router)
 
