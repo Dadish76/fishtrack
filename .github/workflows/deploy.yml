@@ -1,24 +1,15 @@
 
 name: FishTrack CD
 
-# Автоматически после CI и вручную для отката
+# Вызывается заданием deploy_staging внутри FishTrack CI.
+# Для этого не требуется переносить workflow в main.
 on:
-  workflow_run:
-    workflows: ["FishTrack CI"]
-    types: [completed]
-
-  workflow_dispatch:
-    inputs:
-      image_tag:
-        description: "Тег из локального Registry, например 0.4.0 или sha-..."
-        required: true
-        type: string
+  workflow_call:
 
 permissions:
   contents: read
-  actions: read
 
-# Не допускаем одновременных деплоев
+# Не запускаем параллельные обновления одного staging.
 concurrency:
   group: fishtrack-staging
   cancel-in-progress: false
@@ -26,85 +17,60 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to staging
-
-    # Автоматически — только успешный push в develop.
-    # Вручную — только при выборе develop.
     if: >-
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_branch == 'develop' &&
-       github.event.workflow_run.head_repository.full_name == github.repository)
-      ||
-      (github.event_name == 'workflow_dispatch' &&
-       github.ref == 'refs/heads/develop')
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/develop' &&
+      github.repository == 'Dadish76/fishtrack'
 
     runs-on: [self-hosted, Linux, X64, fishtrack-cd]
+    timeout-minutes: 30
 
     env:
-      IMAGE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.image_tag || format('sha-{0}', github.event.workflow_run.head_sha) }}
+      IMAGE_TAG: sha-${{ github.sha }}
 
     steps:
       - name: Checkout deployment scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'develop' }}
           persist-credentials: false
 
       - name: Validate image tag
         shell: bash
         run: |
           set -euo pipefail
-
-          if [[ ! "$IMAGE_TAG" =~ ^sha-[0-9a-f]{40}$ ]] &&
-             [[ ! "$IMAGE_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ! "$IMAGE_TAG" =~ ^sha-[0-9a-f]{40}$ ]]; then
             echo "ERROR: Invalid image tag: $IMAGE_TAG"
             exit 1
           fi
-
           echo "Selected image tag: $IMAGE_TAG"
 
-      # Только автоматический выпуск:
-      # скачиваем образ из уже завершённого CI
-      - name: Download Docker image from CI
-        if: github.event_name == 'workflow_run'
+      - name: Download verified Docker image
         uses: actions/download-artifact@v8
         with:
-          name: fishtrack-image-${{ github.event.workflow_run.head_sha }}
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ github.token }}
+          name: fishtrack-image-${{ github.sha }}
           path: ci-artifacts
 
-      # Загружаем готовый образ в локальный Registry
       - name: Publish image to local Registry
-        if: github.event_name == 'workflow_run'
         shell: bash
-        env:
-          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
-
           test -s ci-artifacts/fishtrack.tar.gz
-
           curl -fsS http://127.0.0.1:5000/v2/ > /dev/null
 
+          # Готовый образ загружаем из артефакта CI, без docker build.
           docker load -i ci-artifacts/fishtrack.tar.gz
 
-          SOURCE="fishtrack:ci-${RELEASE_SHA}"
-          TARGET="localhost:5000/fishtrack:sha-${RELEASE_SHA}"
-
+          SOURCE="fishtrack:ci-${GITHUB_SHA}"
+          TARGET="localhost:5000/fishtrack:${IMAGE_TAG}"
           docker image inspect "$SOURCE" > /dev/null
-
           docker tag "$SOURCE" "$TARGET"
           docker push "$TARGET"
-
           echo "Published image: $TARGET"
 
-      # Одинаковый механизм для автоматического
-      # развертывания и ручного rollback
       - name: Deploy image to staging
         shell: bash
         run: |
+          set -euo pipefail
           bash scripts/deploy_staging.sh "$IMAGE_TAG"
 
       - name: Deployment summary
