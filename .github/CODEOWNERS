@@ -3,6 +3,7 @@
 
 # Тесты приложения
 /backend/tests/ @Dadish76
+/backend/.bandit @Dadish76 @f1stle
 
 # Команды локальных проверок
 /Makefile @Dadish76
