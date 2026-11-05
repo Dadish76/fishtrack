@@ -1,0 +1,6 @@
+{
+  "name": "lab6-smoke-{RUN_ID}",
+  "registration_number": "LAB6-{RUN_ID}",
+  "capacity": 4,
+  "year_built": 2020
+}
