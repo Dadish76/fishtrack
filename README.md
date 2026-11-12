@@ -80,3 +80,11 @@
 
 ```bash
 make verify
+
+## Демонстрация CI/CD
+
+Docker-образ FishTrack собирается в GitHub Actions,
+проверяется Trivy, публикуется в локальный Docker Registry
+и автоматически развёртывается на staging.
+
+После деплоя выполняются HTTP и CRUD smoke-тесты.
