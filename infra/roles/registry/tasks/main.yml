@@ -1,0 +1,31 @@
+---
+- name: Create local Registry storage directory
+  ansible.builtin.file:
+    path: "{{ fishtrack_registry_data_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Start local Docker Registry
+  community.docker.docker_container:
+    name: fishtrack-local-registry
+    image: "{{ fishtrack_registry_image }}"
+    state: started
+    pull: missing
+    restart_policy: unless-stopped
+    privileged: false
+    published_ports:
+      - "127.0.0.1:{{ fishtrack_registry_port }}:5000"
+    volumes:
+      - "{{ fishtrack_registry_data_dir }}:/var/lib/registry"
+
+- name: Verify local Registry API
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ fishtrack_registry_port }}/v2/"
+    method: GET
+    status_code: 200
+  register: registry_response
+  retries: 10
+  delay: 3
+  until: registry_response.status == 200

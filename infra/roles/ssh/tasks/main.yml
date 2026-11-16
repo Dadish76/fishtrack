@@ -1,0 +1,12 @@
+---
+- name: Deploy secure SSH configuration
+  ansible.builtin.template:
+    src: 00-fishtrack.conf.j2
+    dest: /etc/ssh/sshd_config.d/00-fishtrack.conf
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "/usr/sbin/sshd -t -f %s"
+  notify:
+    - Validate SSH configuration
+    - Reload SSH

@@ -1,0 +1,30 @@
+---
+- name: Verify Ubuntu operating system
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['distribution'] == 'Ubuntu'
+    fail_msg: "Only Ubuntu is supported"
+
+- name: Install required system packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - git
+      - python3
+      - python3-apt
+      - python3-debian
+      - openssh-server
+      - sudo
+      - ufw
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Deploy managed node configuration
+  ansible.builtin.template:
+    src: fishtrack-node.conf.j2
+    dest: /etc/fishtrack-node.conf
+    owner: root
+    group: root
+    mode: "0644"

@@ -1,0 +1,29 @@
+---
+- name: Create FishTrack deployment user
+  ansible.builtin.user:
+    name: "{{ fishtrack_deployer_user }}"
+    state: present
+    shell: /bin/bash
+    create_home: true
+    password_lock: true
+    groups:
+      - docker
+    append: true
+
+- name: Configure deployment SSH public key
+  ansible.posix.authorized_key:
+    user: "{{ fishtrack_deployer_user }}"
+    state: present
+    key: >-
+      {{ lookup(
+        'ansible.builtin.file',
+        playbook_dir ~ '/files/keys/deployer.pub'
+      ) }}
+
+- name: Configure FishTrack project directory
+  ansible.builtin.file:
+    path: "{{ fishtrack_directory }}"
+    state: directory
+    owner: "{{ fishtrack_deployer_user }}"
+    group: "{{ fishtrack_deployer_user }}"
+    mode: "0750"
