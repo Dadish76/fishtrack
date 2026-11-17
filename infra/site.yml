@@ -11,3 +11,4 @@
     - ssh
     - firewall
     - registry
+    - fishtrack_app
