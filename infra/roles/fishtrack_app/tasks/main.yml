@@ -1,0 +1,147 @@
+---
+- name: Загрузить зашифрованные секреты FishTrack
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/vault/{{ fishtrack_environment }}.yml"
+  no_log: true
+
+- name: Проверить наличие секретов приложения
+  ansible.builtin.assert:
+    that:
+      - vault_fishtrack_db_password is defined
+      - vault_fishtrack_secret_key is defined
+      - vault_fishtrack_admin_password is defined
+    fail_msg: "Отсутствуют обязательные секреты FishTrack"
+  no_log: true
+
+- name: Создать каталог FishTrack demo
+  ansible.builtin.file:
+    path: "{{ fishtrack_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Получить исходный код FishTrack из GitHub
+  ansible.builtin.git:
+    repo: https://github.com/Dadish76/fishtrack.git
+    dest: "{{ fishtrack_directory }}/source"
+    version: "{{ fishtrack_source_ref }}"
+    update: true
+  register: fishtrack_app_source_checkout
+
+- name: Собрать Docker-образ FishTrack
+  community.docker.docker_image:
+    name: fishtrack-demo
+    tag: "{{ fishtrack_app_source_checkout.after[:12] }}"
+    source: build
+    build:
+      path: "{{ fishtrack_directory }}/source"
+      dockerfile: "{{ fishtrack_dockerfile_path }}"
+    state: present
+
+- name: Создать защищённый файл .env
+  ansible.builtin.template:
+    src: app.env.j2
+    dest: "{{ fishtrack_directory }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
+- name: Создать конфигурацию Nginx
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ fishtrack_directory }}/nginx.conf"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Создать Docker Compose
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ fishtrack_directory }}/compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Проверить конфигурацию Docker Compose
+  ansible.builtin.command:
+    cmd: docker compose -f compose.yml config --quiet
+    chdir: "{{ fishtrack_directory }}"
+  changed_when: false
+  no_log: true
+
+- name: Проверить файл установленной версии FishTrack
+  ansible.builtin.stat:
+    path: "{{ fishtrack_directory }}/.deployed_sha"
+  register: fishtrack_app_revision_stat
+
+- name: Прочитать установленную версию FishTrack
+  ansible.builtin.slurp:
+    src: "{{ fishtrack_directory }}/.deployed_sha"
+  register: fishtrack_app_revision_file
+  when: fishtrack_app_revision_stat.stat.exists
+
+- name: Определить необходимость первоначального развёртывания
+  ansible.builtin.set_fact:
+    fishtrack_app_bootstrap_needed: >-
+      {{
+        not fishtrack_app_revision_stat.stat.exists
+        or (
+          fishtrack_app_revision_file.content
+          | default('')
+          | b64decode
+          | trim
+        ) != fishtrack_app_source_checkout.after[:12]
+      }}
+
+- name: Развернуть новую версию FishTrack с миграциями
+  community.docker.docker_compose_v2:
+    project_src: "{{ fishtrack_directory }}"
+    project_name: "{{ fishtrack_project_name }}"
+    files:
+      - compose.yml
+    state: present
+    build: never
+  when: fishtrack_app_bootstrap_needed
+
+- name: Поддерживать постоянные сервисы FishTrack
+  community.docker.docker_compose_v2:
+    project_src: "{{ fishtrack_directory }}"
+    project_name: "{{ fishtrack_project_name }}"
+    files:
+      - compose.yml
+    state: present
+    build: never
+    services:
+      - db
+      - app1
+      - app2
+      - nginx
+    dependencies: false
+  when: not fishtrack_app_bootstrap_needed
+
+- name: Проверить HTTP endpoints FishTrack
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ fishtrack_http_port }}{{ item }}"
+    method: GET
+    status_code: 200
+  loop:
+    - /health
+    - /version
+    - /docs
+    - /openapi.json
+  register: fishtrack_app_http_response
+  until: fishtrack_app_http_response.status == 200
+  retries: 15
+  delay: 2
+  changed_when: false
+
+- name: Сохранить успешно развёрнутую версию FishTrack
+  ansible.builtin.copy:
+    dest: "{{ fishtrack_directory }}/.deployed_sha"
+    content: "{{ fishtrack_app_source_checkout.after[:12] }}\n"
+    owner: root
+    group: root
+    mode: "0644"
+  when: fishtrack_app_bootstrap_needed

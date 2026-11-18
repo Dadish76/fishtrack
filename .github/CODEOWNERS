@@ -27,3 +27,6 @@
 /docker-compose.yml @Dadish76
 /.dockerignore @Dadish76
 /nginx/ @Dadish76
+
+# Инфраструктура Ansible
+/infra/ @Dadish76 @f1stle
