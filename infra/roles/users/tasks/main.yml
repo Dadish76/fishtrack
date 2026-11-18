@@ -24,6 +24,6 @@
   ansible.builtin.file:
     path: "{{ fishtrack_directory }}"
     state: directory
-    owner: "{{ fishtrack_deployer_user }}"
-    group: "{{ fishtrack_deployer_user }}"
+    owner: "{{ fishtrack_directory_owner | default(fishtrack_deployer_user) }}"
+    group: "{{ fishtrack_directory_group | default(fishtrack_deployer_user) }}"
     mode: "0750"

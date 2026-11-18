@@ -22,3 +22,6 @@ fishtrack_migration_command:
   - alembic
   - upgrade
   - head
+
+fishtrack_directory_owner: root
+fishtrack_directory_group: root

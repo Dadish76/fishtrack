@@ -71,7 +71,31 @@
   changed_when: false
   no_log: true
 
-- name: Запустить контейнеры FishTrack demo
+- name: Проверить файл установленной версии FishTrack
+  ansible.builtin.stat:
+    path: "{{ fishtrack_directory }}/.deployed_sha"
+  register: fishtrack_app_revision_stat
+
+- name: Прочитать установленную версию FishTrack
+  ansible.builtin.slurp:
+    src: "{{ fishtrack_directory }}/.deployed_sha"
+  register: fishtrack_app_revision_file
+  when: fishtrack_app_revision_stat.stat.exists
+
+- name: Определить необходимость первоначального развёртывания
+  ansible.builtin.set_fact:
+    fishtrack_app_bootstrap_needed: >-
+      {{
+        not fishtrack_app_revision_stat.stat.exists
+        or (
+          fishtrack_app_revision_file.content
+          | default('')
+          | b64decode
+          | trim
+        ) != fishtrack_app_source_checkout.after[:12]
+      }}
+
+- name: Развернуть новую версию FishTrack с миграциями
   community.docker.docker_compose_v2:
     project_src: "{{ fishtrack_directory }}"
     project_name: "{{ fishtrack_project_name }}"
@@ -79,6 +103,23 @@
       - compose.yml
     state: present
     build: never
+  when: fishtrack_app_bootstrap_needed
+
+- name: Поддерживать постоянные сервисы FishTrack
+  community.docker.docker_compose_v2:
+    project_src: "{{ fishtrack_directory }}"
+    project_name: "{{ fishtrack_project_name }}"
+    files:
+      - compose.yml
+    state: present
+    build: never
+    services:
+      - db
+      - app1
+      - app2
+      - nginx
+    dependencies: false
+  when: not fishtrack_app_bootstrap_needed
 
 - name: Проверить HTTP endpoints FishTrack
   ansible.builtin.uri:
@@ -95,3 +136,12 @@
   retries: 15
   delay: 2
   changed_when: false
+
+- name: Сохранить успешно развёрнутую версию FishTrack
+  ansible.builtin.copy:
+    dest: "{{ fishtrack_directory }}/.deployed_sha"
+    content: "{{ fishtrack_app_source_checkout.after[:12] }}\n"
+    owner: root
+    group: root
+    mode: "0644"
+  when: fishtrack_app_bootstrap_needed

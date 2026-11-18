@@ -46,6 +46,7 @@ services:
       DATABASE_URL: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD_URLENCODED:?POSTGRES_PASSWORD_URLENCODED is required}@db:5432/${POSTGRES_DB}"
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
       INSTANCE_ID: app1
+      IMAGE_TAG: "{{ fishtrack_app_source_checkout.after[:12] }}"
     networks:
       - internal
     depends_on:
@@ -74,6 +75,7 @@ services:
       DATABASE_URL: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD_URLENCODED:?POSTGRES_PASSWORD_URLENCODED is required}@db:5432/${POSTGRES_DB}"
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
       INSTANCE_ID: app2
+      IMAGE_TAG: "{{ fishtrack_app_source_checkout.after[:12] }}"
     networks:
       - internal
     depends_on:
