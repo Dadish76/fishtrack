@@ -7,7 +7,7 @@ fishtrack_http_port: 8082
 fishtrack_ssh_allowed_cidr: "192.168.56.0/24"
 fishtrack_firewall_remove_broad_ssh: true
 
-fishtrack_source_ref: "feature/lab7-app-ansible"
+fishtrack_source_ref: "develop"
 fishtrack_dockerfile_path: Dockerfile
 
 fishtrack_app_internal_port: 8000
