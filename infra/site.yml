@@ -1,0 +1,13 @@
+---
+- name: Configure FishTrack demo server
+  hosts: demo
+  become: true
+  gather_facts: true
+
+  roles:
+    - common
+    - docker
+    - users
+    - ssh
+    - firewall
+    - registry

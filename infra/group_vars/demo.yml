@@ -1,0 +1,8 @@
+---
+fishtrack_environment: demo
+fishtrack_project_name: fishtrack-demo
+fishtrack_directory: /opt/fishtrack-demo
+fishtrack_http_port: 8082
+
+fishtrack_ssh_allowed_cidr: "192.168.56.0/24"
+fishtrack_firewall_remove_broad_ssh: true

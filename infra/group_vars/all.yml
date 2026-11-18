@@ -1,0 +1,8 @@
+---
+fishtrack_deployer_user: deployer
+
+fishtrack_ssh_port: 22
+
+fishtrack_registry_port: 5000
+fishtrack_registry_image: "registry:3.1.2"
+fishtrack_registry_data_dir: /srv/fishtrack-registry

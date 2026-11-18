@@ -1,0 +1,70 @@
+---
+- name: Check installed Docker-related packages
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Check for conflicting Docker packages
+  ansible.builtin.assert:
+    that:
+      - "'docker.io' not in ansible_facts.packages"
+      - "'containerd' not in ansible_facts.packages"
+      - "'runc' not in ansible_facts.packages"
+      - "'podman-docker' not in ansible_facts.packages"
+    fail_msg: >-
+      Conflicting Docker packages found.
+      Review installed packages before proceeding.
+
+- name: Create Docker APT keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download official Docker GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Refresh Docker APT cache
+
+- name: Add official Docker APT repository
+  ansible.builtin.deb822_repository:
+    name: docker
+    types:
+      - deb
+    uris:
+      - https://download.docker.com/linux/ubuntu
+    suites:
+      - "{{ ansible_facts['distribution_release'] }}"
+    components:
+      - stable
+    architectures:
+      - amd64
+    signed_by: /etc/apt/keyrings/docker.asc
+    state: present
+  notify: Refresh Docker APT cache
+
+- name: Apply pending Docker APT cache refresh
+  ansible.builtin.meta: flush_handlers
+
+- name: Install Docker Engine and Compose plugin
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started
