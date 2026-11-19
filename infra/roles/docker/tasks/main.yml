@@ -51,7 +51,20 @@
 - name: Apply pending Docker APT cache refresh
   ansible.builtin.meta: flush_handlers
 
-- name: Install or update Docker Engine and Compose to latest stable versions
+- name: Install Docker Engine and Compose packages
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+    lock_timeout: 120
+
+- name: Update installed Docker Engine and Compose packages
   ansible.builtin.apt:
     name:
       - docker-ce
@@ -60,8 +73,7 @@
       - docker-buildx-plugin
       - docker-compose-plugin
     state: latest
-    update_cache: true
-    cache_valid_time: 0
+    only_upgrade: true
     lock_timeout: 120
 
 - name: Read installed Docker Engine version
