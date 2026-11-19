@@ -6,11 +6,21 @@ from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.templating import Jinja2Templates
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from .database import engine
 from .logging_config import setup_logging
+from .metrics import (
+    APP_HEALTH,
+    HTTP_DURATION,
+    HTTP_ERRORS,
+    HTTP_REQUESTS,
+)
 from .routes import router as api_router
 from .web import router as web_router
 
@@ -70,6 +80,26 @@ async def request_logging(request: Request, call_next):
         result = "success"
         level = logging.INFO
 
+    # Не включаем сбор собственных метрик в статистику HTTP.
+    if path != "/metrics":
+        HTTP_REQUESTS.labels(
+            method=request.method,
+            path=path,
+            status=str(status_code),
+        ).inc()
+
+        if status_code >= 400:
+            HTTP_ERRORS.labels(
+                method=request.method,
+                path=path,
+                status=str(status_code),
+            ).inc()
+
+        HTTP_DURATION.labels(
+            method=request.method,
+            path=path,
+        ).observe(duration_ms / 1000.0)
+
     response.headers["X-Request-ID"] = request_id
     response.headers["X-Instance-ID"] = os.getenv("INSTANCE_ID", "unknown")
 
@@ -116,12 +146,47 @@ def get_version():
     }
 
 
-@app.get("/health")
-async def health_check():
+@app.get("/metrics", include_in_schema=False)
+def metrics_endpoint():
+    return Response(
+        content=generate_latest(),
+        media_type=CONTENT_TYPE_LATEST,
+    )
+
+
+@app.get("/live", tags=["system"])
+def liveness():
     return {
-        "status": "healthy",
+        "status": "alive",
         "service": "FishTrack",
     }
+
+
+@app.get("/health", tags=["system"])
+def health_check():
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        APP_HEALTH.set(1)
+
+        return {
+            "status": "healthy",
+            "service": "FishTrack",
+            "database": "connected",
+        }
+
+    except SQLAlchemyError:
+        APP_HEALTH.set(0)
+
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "unhealthy",
+                "service": "FishTrack",
+                "database": "unavailable",
+            },
+        )
 
 
 # ============================================

@@ -11,7 +11,14 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgresql://user:password@localhost:5432/fishtrack"
 )
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args=(
+        {"connect_timeout": 2} if DATABASE_URL.startswith("postgresql") else {}
+    ),
+)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

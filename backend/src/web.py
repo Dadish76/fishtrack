@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from .auth import create_session_token, get_current_user, login_user
 from .database import get_db
+from .metrics import TRIPS_CREATED
 from .models import Boat, Crew, Trip
 
 router = APIRouter()
@@ -309,6 +310,9 @@ def web_trip_create(
     )
     db.add(trip)
     db.commit()
+
+    TRIPS_CREATED.inc()
+
     return RedirectResponse(url="/web/trips", status_code=303)
 
 
