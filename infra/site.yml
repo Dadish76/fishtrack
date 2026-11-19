@@ -11,4 +11,6 @@
     - ssh
     - firewall
     - registry
-    - fishtrack_app
+    - role: fishtrack_app
+      tags:
+        - fishtrack_app
