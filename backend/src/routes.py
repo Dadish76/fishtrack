@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from .database import get_db
+from .metrics import TRIPS_CREATED
 from .models import Boat, Crew, Trip
 from .schemas import (
     BoatCreate,
@@ -151,6 +152,9 @@ def create_trip(trip: TripCreate, db: Session = Depends(get_db)):
     db.add(db_trip)
     db.commit()
     db.refresh(db_trip)
+
+    TRIPS_CREATED.inc()
+
     return db_trip
 
 
