@@ -65,8 +65,7 @@ async def request_logging(request: Request, call_next):
     status_code = response.status_code
 
     route = request.scope.get("route")
-
-    path = route.path if route is not None else "unmatched"
+    path = getattr(route, "path", "unmatched")
 
     if status_code >= 500:
         result = "server_error"
@@ -80,7 +79,8 @@ async def request_logging(request: Request, call_next):
         result = "success"
         level = logging.INFO
 
-    # Не включаем сбор собственных метрик в статистику HTTP.
+    # Не включаем сбор собственных метрик
+    # в статистику HTTP.
     if path != "/metrics":
         HTTP_REQUESTS.labels(
             method=request.method,
@@ -101,7 +101,10 @@ async def request_logging(request: Request, call_next):
         ).observe(duration_ms / 1000.0)
 
     response.headers["X-Request-ID"] = request_id
-    response.headers["X-Instance-ID"] = os.getenv("INSTANCE_ID", "unknown")
+    response.headers["X-Instance-ID"] = os.getenv(
+        "INSTANCE_ID",
+        "unknown",
+    )
 
     logger.log(
         level,
@@ -124,6 +127,7 @@ async def request_logging(request: Request, call_next):
 # ============================================
 # ROUTERS
 # ============================================
+
 
 app.include_router(
     api_router,
