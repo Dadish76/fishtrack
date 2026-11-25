@@ -1,0 +1,367 @@
+﻿{
+    "source":  "incident.json",
+    "source_status":  "incomplete",
+    "environment":  "local-docker-desktop",
+    "project":  "fishtrack-lab8-20261125201915",
+    "version":  "sha-5d682aa68fd16bf4274c005e769d5ae81db228e2",
+    "collected_at":  "2026-11-26T00:44:36.4354085+03:00",
+    "log_since_utc":  "2026-11-25T21:40:54.9500751Z",
+    "log_until_utc":  "2026-11-25T21:42:26.8124819Z",
+    "status":  "historical_logs_and_recovery_verified",
+    "database_events":  [
+                            {
+                                "timestamp":  "2026-11-25T21:40:56.479568136Z",
+                                "component":  "postgresql",
+                                "message":  "received fast shutdown request"
+                            },
+                            {
+                                "timestamp":  "2026-11-25T21:40:56.518779182Z",
+                                "component":  "postgresql",
+                                "message":  "database system is shut down"
+                            },
+                            {
+                                "timestamp":  "2026-11-25T21:41:41.349637923Z",
+                                "component":  "postgresql",
+                                "message":  "database system is ready to accept connections"
+                            }
+                        ],
+    "application_logs":  [
+                             {
+                                 "timestamp":  "2026-11-25T21:40:55.8144490+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "16a5b3e6-5e25-4ce3-8422-4efa9c683dbe",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:40:55.9974420+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/live",
+                                 "status_code":  200,
+                                 "request_id":  "00bb94ea-04f2-4bc0-930f-5a844a8e1317",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:08.5250920+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "f539f923-8f72-468a-8c6c-e90283b726f9",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:20.5415040+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "fe36db15-1a05-466c-85be-92bc967ea5c5",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:32.7324660+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "8ca82cf7-0824-40b3-9fce-2ac2346043b8",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:44.7341590+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "57adc2b0-f22f-4717-a187-5addc712bb74",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:52.9208660+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "f9252a26-6e01-4ef5-a219-74bedc877ffe",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:42:03.0180740+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "0c09d78c-16e8-4b1d-960a-2f75366c7499",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:42:13.1097490+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "3016effa-3dc6-464c-88c6-159132114ba4",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:42:23.1908350+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "aba06d0d-93eb-4f75-8774-bee88d965f7a",
+                                 "instance_id":  "app1"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:40:56.1806780+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "b099dd16-04a8-49b1-af53-255c189d007f",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:40:56.3795410+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/live",
+                                 "status_code":  200,
+                                 "request_id":  "78c43dcd-be39-43d8-a708-96165d4d803c",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:07.9639620+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "ae2c3ca2-9f39-4580-8214-34efd1192c33",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:20.0504560+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "6130bebe-431e-42ba-b90b-c61156c83a16",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:32.2675780+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "4b99d4b9-a5a4-417d-a33d-1a252ff87f75",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:44.3102930+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  503,
+                                 "request_id":  "f5b95634-a4f1-47cc-a0e0-ea66d2c227ed",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:41:52.4769210+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "a7586d45-aa58-4952-9e23-dd9e4bd82721",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:42:02.5896530+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "d0e7672b-fff5-4236-8dcc-5c4638bf71d0",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:42:12.6766250+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "245bd9c7-5b20-46bc-9866-f1b8073f97cf",
+                                 "instance_id":  "app2"
+                             },
+                             {
+                                 "timestamp":  "2026-11-25T21:42:22.7684370+00:00",
+                                 "event":  "http_request",
+                                 "method":  "GET",
+                                 "path":  "/health",
+                                 "status_code":  200,
+                                 "request_id":  "0c1975c7-c62c-408c-b7a1-a8962e30bc5e",
+                                 "instance_id":  "app2"
+                             }
+                         ],
+    "health_503_before_restart":  [
+                                      {
+                                          "timestamp":  "2026-11-25T21:41:08.5250920+00:00",
+                                          "event":  "http_request",
+                                          "method":  "GET",
+                                          "path":  "/health",
+                                          "status_code":  503,
+                                          "request_id":  "f539f923-8f72-468a-8c6c-e90283b726f9",
+                                          "instance_id":  "app1"
+                                      },
+                                      {
+                                          "timestamp":  "2026-11-25T21:41:20.5415040+00:00",
+                                          "event":  "http_request",
+                                          "method":  "GET",
+                                          "path":  "/health",
+                                          "status_code":  503,
+                                          "request_id":  "fe36db15-1a05-466c-85be-92bc967ea5c5",
+                                          "instance_id":  "app1"
+                                      },
+                                      {
+                                          "timestamp":  "2026-11-25T21:41:32.7324660+00:00",
+                                          "event":  "http_request",
+                                          "method":  "GET",
+                                          "path":  "/health",
+                                          "status_code":  503,
+                                          "request_id":  "8ca82cf7-0824-40b3-9fce-2ac2346043b8",
+                                          "instance_id":  "app1"
+                                      },
+                                      {
+                                          "timestamp":  "2026-11-25T21:41:07.9639620+00:00",
+                                          "event":  "http_request",
+                                          "method":  "GET",
+                                          "path":  "/health",
+                                          "status_code":  503,
+                                          "request_id":  "ae2c3ca2-9f39-4580-8214-34efd1192c33",
+                                          "instance_id":  "app2"
+                                      },
+                                      {
+                                          "timestamp":  "2026-11-25T21:41:20.0504560+00:00",
+                                          "event":  "http_request",
+                                          "method":  "GET",
+                                          "path":  "/health",
+                                          "status_code":  503,
+                                          "request_id":  "6130bebe-431e-42ba-b90b-c61156c83a16",
+                                          "instance_id":  "app2"
+                                      },
+                                      {
+                                          "timestamp":  "2026-11-25T21:41:32.2675780+00:00",
+                                          "event":  "http_request",
+                                          "method":  "GET",
+                                          "path":  "/health",
+                                          "status_code":  503,
+                                          "request_id":  "4b99d4b9-a5a4-417d-a33d-1a252ff87f75",
+                                          "instance_id":  "app2"
+                                      }
+                                  ],
+    "baseline_probe_matches":  [
+                                   {
+                                       "timestamp":  "2026-11-25T21:40:55.8144490+00:00",
+                                       "event":  "http_request",
+                                       "method":  "GET",
+                                       "path":  "/health",
+                                       "status_code":  200,
+                                       "request_id":  "16a5b3e6-5e25-4ce3-8422-4efa9c683dbe",
+                                       "instance_id":  "app1"
+                                   },
+                                   {
+                                       "timestamp":  "2026-11-25T21:40:55.9974420+00:00",
+                                       "event":  "http_request",
+                                       "method":  "GET",
+                                       "path":  "/live",
+                                       "status_code":  200,
+                                       "request_id":  "00bb94ea-04f2-4bc0-930f-5a844a8e1317",
+                                       "instance_id":  "app1"
+                                   },
+                                   {
+                                       "timestamp":  "2026-11-25T21:40:56.1806780+00:00",
+                                       "event":  "http_request",
+                                       "method":  "GET",
+                                       "path":  "/health",
+                                       "status_code":  200,
+                                       "request_id":  "b099dd16-04a8-49b1-af53-255c189d007f",
+                                       "instance_id":  "app2"
+                                   },
+                                   {
+                                       "timestamp":  "2026-11-25T21:40:56.3795410+00:00",
+                                       "event":  "http_request",
+                                       "method":  "GET",
+                                       "path":  "/live",
+                                       "status_code":  200,
+                                       "request_id":  "78c43dcd-be39-43d8-a708-96165d4d803c",
+                                       "instance_id":  "app2"
+                                   }
+                               ],
+    "smoke_test":  "passed",
+    "recovery":  {
+                     "database_id":  "6173c602a557eb2d6f869dedd988308ed74da01edea878ba04d956a2fa40132d",
+                     "shutdown_log_found":  true,
+                     "startup_log_found":  true,
+                     "failed_health_logged_for_both":  true,
+                     "version":  "sha-5d682aa68fd16bf4274c005e769d5ae81db228e2",
+                     "health":  {
+                                    "status":  "healthy",
+                                    "service":  "FishTrack",
+                                    "database":  "connected"
+                                },
+                     "/live":  "200",
+                     "/metrics":  "404",
+                     "up{job=\"fishtrack\"}":  [
+                                                   {
+                                                       "instance":  "app2",
+                                                       "value":  "1"
+                                                   },
+                                                   {
+                                                       "instance":  "app1",
+                                                       "value":  "1"
+                                                   }
+                                               ],
+                     "fishtrack_app_healthy{job=\"fishtrack\"}":  [
+                                                                      {
+                                                                          "instance":  "app2",
+                                                                          "value":  "1"
+                                                                      },
+                                                                      {
+                                                                          "instance":  "app1",
+                                                                          "value":  "1"
+                                                                      }
+                                                                  ],
+                     "rules":  [
+                                   {
+                                       "name":  "FishTrackInstanceDown",
+                                       "state":  "inactive",
+                                       "health":  "ok"
+                                   },
+                                   {
+                                       "name":  "FishTrackNotReady",
+                                       "state":  "inactive",
+                                       "health":  "ok"
+                                   },
+                                   {
+                                       "name":  "FishTrackHighErrorRate",
+                                       "state":  "inactive",
+                                       "health":  "ok"
+                                   },
+                                   {
+                                       "name":  "HostHighCPU",
+                                       "state":  "inactive",
+                                       "health":  "ok"
+                                   },
+                                   {
+                                       "name":  "HostHighMemory",
+                                       "state":  "inactive",
+                                       "health":  "ok"
+                                   }
+                               ],
+                     "verified_at":  "2026-11-26T00:44:37.7233171+03:00"
+                 }
+}
