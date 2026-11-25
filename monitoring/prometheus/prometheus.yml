@@ -9,6 +9,10 @@ global:
   # Периодичность вычисления правил.
   evaluation_interval: 10s
 
+# Подключаем правила обнаружения проблем.
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
 scrape_configs:
   # Собственные метрики Prometheus.
   - job_name: "prometheus"
