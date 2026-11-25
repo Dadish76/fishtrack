@@ -34,8 +34,17 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "false"
 
     volumes:
+      # Постоянное хранилище Grafana.
       - grafana_data:/var/lib/grafana
+
+      # Автоматическая настройка источников данных.
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+
+      # Автоматическая настройка Dashboard.
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+
+      # JSON-конфигурации панелей мониторинга.
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
 
     networks:
       - monitoring

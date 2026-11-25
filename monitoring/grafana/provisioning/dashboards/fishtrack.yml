@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  # Загружаем Dashboard FishTrack из репозитория.
+  - name: fishtrack
+    orgId: 1
+    folder: FishTrack
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
