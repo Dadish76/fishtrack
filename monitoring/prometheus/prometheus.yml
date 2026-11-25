@@ -1,0 +1,32 @@
+
+global:
+  # Периодичность сбора метрик.
+  scrape_interval: 10s
+
+  # Максимальное время ожидания ответа.
+  scrape_timeout: 5s
+
+  # Периодичность вычисления правил.
+  evaluation_interval: 10s
+
+scrape_configs:
+  # Сбор собственных метрик Prometheus.
+  - job_name: "prometheus"
+    static_configs:
+      - targets:
+          - "localhost:9090"
+
+  # Сбор метрик обоих экземпляров FishTrack.
+  - job_name: "fishtrack"
+    metrics_path: "/metrics"
+
+    static_configs:
+      - targets:
+          - "app1:8000"
+        labels:
+          instance: "app1"
+
+      - targets:
+          - "app2:8000"
+        labels:
+          instance: "app2"

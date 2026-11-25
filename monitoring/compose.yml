@@ -1,0 +1,63 @@
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.13.5
+
+    restart: unless-stopped
+
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=7d"
+
+    ports:
+      - "127.0.0.1:9090:9090"
+
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+    networks:
+      - monitoring
+      - fishtrack
+
+  grafana:
+    image: grafana/grafana:13.3.2-ubuntu
+
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:3000:3000"
+
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+
+    networks:
+      - monitoring
+
+    depends_on:
+      - prometheus
+
+networks:
+  # Отдельная сеть системы мониторинга.
+  monitoring:
+    driver: bridge
+
+  # Подключение к существующей сети FishTrack.
+  fishtrack:
+    external: true
+    name: "${FISHTRACK_NETWORK:?FISHTRACK_NETWORK is required}"
+
+volumes:
+  # Хранение истории метрик.
+  prometheus_data:
+
+  # Хранение настроек и панелей Grafana.
+  grafana_data:
