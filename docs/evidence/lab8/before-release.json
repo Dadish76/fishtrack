@@ -1,0 +1,146 @@
+﻿{
+    "phase":  "before",
+    "environment":  "local-docker-desktop",
+    "timestamp":  "2026-11-26T00:24:17.2808067+03:00",
+    "version":  {
+                    "app":  "fishtrack",
+                    "version":  "fishtrack-lab8-20261125201915"
+                },
+    "health":  {
+                   "status":  "healthy",
+                   "service":  "FishTrack",
+                   "database":  "connected"
+               },
+    "metrics":  {
+                    "availability":  [
+                                         {
+                                             "labels":  {
+                                                            "__name__":  "up",
+                                                            "instance":  "app2",
+                                                            "job":  "fishtrack"
+                                                        },
+                                             "value":  "1"
+                                         },
+                                         {
+                                             "labels":  {
+                                                            "__name__":  "up",
+                                                            "instance":  "app1",
+                                                            "job":  "fishtrack"
+                                                        },
+                                             "value":  "1"
+                                         }
+                                     ],
+                    "readiness":  [
+                                      {
+                                          "labels":  {
+                                                         "__name__":  "fishtrack_app_healthy",
+                                                         "instance":  "app2",
+                                                         "job":  "fishtrack"
+                                                     },
+                                          "value":  "1"
+                                      },
+                                      {
+                                          "labels":  {
+                                                         "__name__":  "fishtrack_app_healthy",
+                                                         "instance":  "app1",
+                                                         "job":  "fishtrack"
+                                                     },
+                                          "value":  "1"
+                                      }
+                                  ],
+                    "requests_per_second":  [
+                                                {
+                                                    "labels":  {
+
+                                                               },
+                                                    "value":  "0.19610215188185484"
+                                                }
+                                            ],
+                    "errors_5xx_per_second":  [
+                                                  {
+                                                      "labels":  {
+
+                                                                 },
+                                                      "value":  "0"
+                                                  }
+                                              ],
+                    "average_response_ms":  [
+                                                {
+                                                    "labels":  {
+
+                                                               },
+                                                    "value":  "2.288050549447283"
+                                                }
+                                            ],
+                    "p95_response_ms":  [
+                                            {
+                                                "labels":  {
+
+                                                           },
+                                                "value":  "4.75"
+                                            }
+                                        ],
+                    "cpu_percent":  [
+                                        {
+                                            "labels":  {
+
+                                                       },
+                                            "value":  "1.4063419590966242"
+                                        }
+                                    ],
+                    "memory_percent":  [
+                                           {
+                                               "labels":  {
+                                                              "instance":  "fishtrack-host",
+                                                              "job":  "node"
+                                                          },
+                                               "value":  "19.989458745127887"
+                                           }
+                                       ],
+                    "trips_created":  [
+                                          {
+                                              "labels":  {
+                                                             "__name__":  "fishtrack_trips_created_total",
+                                                             "instance":  "app2",
+                                                             "job":  "fishtrack"
+                                                         },
+                                              "value":  "0"
+                                          },
+                                          {
+                                              "labels":  {
+                                                             "__name__":  "fishtrack_trips_created_total",
+                                                             "instance":  "app1",
+                                                             "job":  "fishtrack"
+                                                         },
+                                              "value":  "0"
+                                          }
+                                      ]
+                },
+    "alerts":  [
+                   {
+                       "name":  "FishTrackInstanceDown",
+                       "state":  "inactive",
+                       "health":  "ok"
+                   },
+                   {
+                       "name":  "FishTrackNotReady",
+                       "state":  "inactive",
+                       "health":  "ok"
+                   },
+                   {
+                       "name":  "FishTrackHighErrorRate",
+                       "state":  "inactive",
+                       "health":  "ok"
+                   },
+                   {
+                       "name":  "HostHighCPU",
+                       "state":  "inactive",
+                       "health":  "ok"
+                   },
+                   {
+                       "name":  "HostHighMemory",
+                       "state":  "inactive",
+                       "health":  "ok"
+                   }
+               ]
+}
