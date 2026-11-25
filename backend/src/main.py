@@ -67,6 +67,13 @@ async def request_logging(request: Request, call_next):
     route = request.scope.get("route")
     path = getattr(route, "path", "unmatched")
 
+    if (
+        path != "unmatched"
+        and request.url.path.startswith("/api/v1/")
+        and not path.startswith("/api/v1/")
+    ):
+        path = f"/api/v1{path}"
+
     allowed_methods = {
         "GET",
         "POST",
