@@ -2,7 +2,6 @@
 services:
   prometheus:
     image: prom/prometheus:v3.13.5
-
     restart: unless-stopped
 
     command:
@@ -23,7 +22,6 @@ services:
 
   grafana:
     image: grafana/grafana:13.3.2-ubuntu
-
     restart: unless-stopped
 
     ports:
@@ -45,12 +43,68 @@ services:
     depends_on:
       - prometheus
 
+  # Сбор инфраструктурных метрик Linux.
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.13.1
+    restart: unless-stopped
+
+    pid: host
+
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.disable-defaults"
+      - "--collector.cpu"
+      - "--collector.meminfo"
+      - "--collector.filesystem"
+      - "--collector.loadavg"
+      - "--collector.diskstats"
+      - "--collector.uname"
+
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+    networks:
+      - monitoring
+
+
+  # Сбор метрик использования ресурсов контейнерами.
+  cadvisor:
+    image: ghcr.io/google/cadvisor:v0.61.1
+    restart: unless-stopped
+
+    privileged: true
+    cgroup: host
+
+    command:
+      - "--docker_only=true"
+      - "--housekeeping_interval=10s"
+      - "--store_container_labels=false"
+      - "--whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service"
+
+      # Используем фактический сокет containerd.
+      - "--containerd=/rootfs/run/containerd/containerd.sock"
+
+    volumes:
+      - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+
+    networks:
+      - monitoring
+
+
+
 networks:
   # Отдельная сеть системы мониторинга.
   monitoring:
     driver: bridge
 
-  # Подключение к существующей сети FishTrack.
+  # Существующая сеть приложения FishTrack.
   fishtrack:
     external: true
     name: "${FISHTRACK_NETWORK:?FISHTRACK_NETWORK is required}"
