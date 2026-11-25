@@ -117,9 +117,22 @@ def delete_crew(crew_id: int, db: Session = Depends(get_db)):
 
 
 # TRIP
+
+
 @router.get("/trips", response_model=list[TripResponse])
-def get_trips(db: Session = Depends(get_db)):
-    return db.query(Trip).all()
+def get_trips(
+    has_return_date: bool | None = None,
+    db: Session = Depends(get_db),
+):
+    query = db.query(Trip)
+
+    # Фильтруем рейсы по наличию даты возвращения.
+    if has_return_date is True:
+        query = query.filter(Trip.return_date.is_not(None))
+    elif has_return_date is False:
+        query = query.filter(Trip.return_date.is_(None))
+
+    return query.all()
 
 
 @router.get("/trips/{trip_id}", response_model=TripResponse)
