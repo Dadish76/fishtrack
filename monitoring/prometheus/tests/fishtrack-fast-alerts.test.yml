@@ -1,0 +1,135 @@
+# Проверки нового правила на синтетических метриках.
+rule_files:
+- ../rules/fishtrack-fast-alerts.yml
+evaluation_interval: 5s
+tests:
+- name: healthy
+  interval: 5s
+  input_series:
+  - series: up{job="fishtrack",instance="app1"}
+    values: 1 1 1 1 1 1 1
+  - series: up{job="fishtrack",instance="app2"}
+    values: 1 1 1 1 1 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app1"}
+    values: 1 1 1 1 1 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app2"}
+    values: 1 1 1 1 1 1 1
+  alert_rule_test:
+  - eval_time: 10s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+- name: one_instance_not_ready
+  interval: 5s
+  input_series:
+  - series: up{job="fishtrack",instance="app1"}
+    values: 1 1 1 1 1 1 1
+  - series: up{job="fishtrack",instance="app2"}
+    values: 1 1 1 1 1 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app1"}
+    values: 0 0 0 0 0 0 0
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app2"}
+    values: 1 1 1 1 1 1 1
+  alert_rule_test:
+  - eval_time: 10s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+- name: both_not_ready_and_recover
+  interval: 5s
+  input_series:
+  - series: up{job="fishtrack",instance="app1"}
+    values: 1 1 1 1 1 1 1
+  - series: up{job="fishtrack",instance="app2"}
+    values: 1 1 1 1 1 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app1"}
+    values: 1 1 0 0 0 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app2"}
+    values: 1 1 0 0 0 1 1
+  alert_rule_test:
+  - eval_time: 5s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 10s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 15s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts:
+    - &id001
+      exp_labels:
+        severity: critical
+        component: application
+      exp_annotations:
+        summary: Оба экземпляра FishTrack не готовы
+        description: Метрики обоих экземпляров доступны, но проверки готовности не проходят. Проверьте общие зависимости,
+          включая PostgreSQL.
+  - eval_time: 20s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts:
+    - *id001
+  - eval_time: 25s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+- name: one_evaluation_only
+  interval: 5s
+  input_series:
+  - series: up{job="fishtrack",instance="app1"}
+    values: 1 1 1 1 1 1 1
+  - series: up{job="fishtrack",instance="app2"}
+    values: 1 1 1 1 1 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app1"}
+    values: 1 1 0 1 1 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app2"}
+    values: 1 1 0 1 1 1 1
+  alert_rule_test:
+  - eval_time: 10s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 15s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+- name: missing_readiness_series
+  interval: 5s
+  input_series:
+  - series: up{job="fishtrack",instance="app1"}
+    values: 1 1 1 1 1 1 1
+  - series: up{job="fishtrack",instance="app2"}
+    values: 1 1 1 1 1 1 1
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app1"}
+    values: 0 0 0 0 0 0 0
+  alert_rule_test:
+  - eval_time: 10s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+- name: one_target_down
+  interval: 5s
+  input_series:
+  - series: up{job="fishtrack",instance="app1"}
+    values: 1 1 1 1 1 1 1
+  - series: up{job="fishtrack",instance="app2"}
+    values: 0 0 0 0 0 0 0
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app1"}
+    values: 0 0 0 0 0 0 0
+  - series: fishtrack_app_healthy{job="fishtrack",instance="app2"}
+    values: 0 0 0 0 0 0 0
+  alert_rule_test:
+  - eval_time: 10s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: FishTrackBothInstancesNotReady
+    exp_alerts: []

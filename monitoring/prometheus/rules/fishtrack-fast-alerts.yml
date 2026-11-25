@@ -1,0 +1,19 @@
+groups:
+  # Быстрое обнаружение общей потери готовности двух экземпляров.
+  - name: fishtrack_fast_detection
+    interval: 5s
+    rules:
+      - alert: FishTrackBothInstancesNotReady
+        expr: |
+          count(
+            (fishtrack_app_healthy{job="fishtrack",instance=~"app1|app2"} == 0)
+            and on (job, instance)
+            (up{job="fishtrack",instance=~"app1|app2"} == 1)
+          ) == 2
+        for: 5s
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "Оба экземпляра FishTrack не готовы"
+          description: "Метрики обоих экземпляров доступны, но проверки готовности не проходят. Проверьте общие зависимости, включая PostgreSQL."

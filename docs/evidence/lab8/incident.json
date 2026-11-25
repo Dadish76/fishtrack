@@ -1,0 +1,924 @@
+﻿{
+    "environment":  "local-docker-desktop",
+    "project":  "fishtrack-lab8-20261125201915",
+    "version":  "sha-5d682aa68fd16bf4274c005e769d5ae81db228e2",
+    "started_at":  "2026-11-26T00:40:54.9500751+03:00",
+    "status":  "incomplete",
+    "timeline":  [
+                     {
+                         "timestamp":  "2026-11-26T00:40:56.4042225+03:00",
+                         "event":  "baseline_verified"
+                     },
+                     {
+                         "timestamp":  "2026-11-26T00:40:56.4104786+03:00",
+                         "event":  "database_stop_requested"
+                     },
+                     {
+                         "timestamp":  "2026-11-26T00:40:56.7966815+03:00",
+                         "event":  "database_stopped"
+                     },
+                     {
+                         "timestamp":  "2026-11-26T00:41:31.9128193+03:00",
+                         "event":  "alert_pending_observed"
+                     },
+                     {
+                         "timestamp":  "2026-11-26T00:41:40.8818113+03:00",
+                         "event":  "database_start_requested"
+                     },
+                     {
+                         "timestamp":  "2026-11-26T00:41:41.1420745+03:00",
+                         "event":  "database_start_returned"
+                     },
+                     {
+                         "timestamp":  "2026-11-26T00:42:21.8124819+03:00",
+                         "event":  "readiness_and_alert_recovered"
+                     }
+                 ],
+    "observations":  [
+                         {
+                             "timestamp":  "2026-11-26T00:40:55.6245883+03:00",
+                             "phase":  "before",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:40:56.8010401+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:01.8103123+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:06.8197337+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:11.8302303+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:16.8427730+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:21.8585990+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:26.8699689+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:31.8839900+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "pending",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "pending",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:36.9332283+03:00",
+                             "phase":  "incident",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "pending",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "pending",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:41.1469701+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "pending",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "pending",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:46.2331166+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "pending",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "pending",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:51.3245573+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "0"
+                                           },
+                             "not_ready_rule":  "pending",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "pending",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:41:56.3919429+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "pending",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "pending",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:42:01.4606959+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "0",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "firing",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+                                            "app2",
+                                            "app1"
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "firing",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:42:06.5507922+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "firing",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+                                            "app2",
+                                            "app1"
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "firing",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:42:11.6306410+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "firing",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+                                            "app1"
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "firing",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:42:16.6933924+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "firing",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+                                            "app1"
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "firing",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         },
+                         {
+                             "timestamp":  "2026-11-26T00:42:21.7542075+03:00",
+                             "phase":  "recovery",
+                             "up":  {
+                                        "app1":  "1",
+                                        "app2":  "1"
+                                    },
+                             "readiness":  {
+                                               "app1":  "1",
+                                               "app2":  "1"
+                                           },
+                             "not_ready_rule":  "inactive",
+                             "instance_down_rule":  "inactive",
+                             "firing":  [
+
+                                        ],
+                             "rules":  [
+                                           {
+                                               "name":  "FishTrackInstanceDown",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackNotReady",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "FishTrackHighErrorRate",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighCPU",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           },
+                                           {
+                                               "name":  "HostHighMemory",
+                                               "state":  "inactive",
+                                               "health":  "ok"
+                                           }
+                                       ]
+                         }
+                     ],
+    "probes":  [
+                   {
+                       "timestamp":  "2026-11-26T00:40:55.8373934+03:00",
+                       "phase":  "before",
+                       "container":  "fishtrack-lab8-20261125201915-app1-1",
+                       "path":  "/health",
+                       "status":  200,
+                       "request_id":  "16a5b3e6-5e25-4ce3-8422-4efa9c683dbe",
+                       "instance":  "app1"
+                   },
+                   {
+                       "timestamp":  "2026-11-26T00:40:56.0195574+03:00",
+                       "phase":  "before",
+                       "container":  "fishtrack-lab8-20261125201915-app1-1",
+                       "path":  "/live",
+                       "status":  200,
+                       "request_id":  "00bb94ea-04f2-4bc0-930f-5a844a8e1317",
+                       "instance":  "app1"
+                   },
+                   {
+                       "timestamp":  "2026-11-26T00:40:56.2066070+03:00",
+                       "phase":  "before",
+                       "container":  "fishtrack-lab8-20261125201915-app2-1",
+                       "path":  "/health",
+                       "status":  200,
+                       "request_id":  "b099dd16-04a8-49b1-af53-255c189d007f",
+                       "instance":  "app2"
+                   },
+                   {
+                       "timestamp":  "2026-11-26T00:40:56.4015559+03:00",
+                       "phase":  "before",
+                       "container":  "fishtrack-lab8-20261125201915-app2-1",
+                       "path":  "/live",
+                       "status":  200,
+                       "request_id":  "78c43dcd-be39-43d8-a708-96165d4d803c",
+                       "instance":  "app2"
+                   }
+               ],
+    "database_events":  [
+
+                        ],
+    "application_logs":  [
+
+                         ],
+    "smoke_test":  "not_run",
+    "database_id_before":  "6173c602a557eb2d6f869dedd988308ed74da01edea878ba04d956a2fa40132d",
+    "finished_at":  "2026-11-26T00:42:21.8156592+03:00"
+}

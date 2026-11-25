@@ -1,0 +1,36 @@
+name: Monitoring CI
+
+on:
+  push:
+    paths:
+      - 'monitoring/**'
+      - '.github/workflows/monitoring-ci.yml'
+  pull_request:
+    paths:
+      - 'monitoring/**'
+      - '.github/workflows/monitoring-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  monitoring-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Проверка конфигурации и правил Prometheus
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=prom/prometheus:v3.13.5
+          docker pull "$image"
+          promtool() {
+            docker run --rm --pull never --network none \
+              --mount "type=bind,source=$PWD/monitoring/prometheus,target=/etc/prometheus,readonly" \
+              --entrypoint /bin/promtool "$image" "$@"
+          }
+          promtool check config /etc/prometheus/prometheus.yml
+          promtool check rules /etc/prometheus/rules/fishtrack-alerts.yml /etc/prometheus/rules/fishtrack-fast-alerts.yml
+          promtool test rules /etc/prometheus/tests/fishtrack-fast-alerts.test.yml
