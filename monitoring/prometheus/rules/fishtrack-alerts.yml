@@ -1,0 +1,112 @@
+
+groups:
+  # Правила обнаружения проблем приложения.
+  - name: fishtrack_application
+    interval: 10s
+
+    rules:
+      # Обнаружение недоступности экземпляра приложения.
+      - alert: FishTrackInstanceDown
+        expr: up{job="fishtrack"} == 0
+        for: 30s
+
+        labels:
+          severity: critical
+          component: application
+
+        annotations:
+          summary: "Экземпляр FishTrack недоступен"
+          description: "Prometheus не получает метрики экземпляра {{ $labels.instance }} более 30 секунд."
+
+      # Обнаружение потери готовности приложения.
+      - alert: FishTrackNotReady
+        expr: |
+          (fishtrack_app_healthy{job="fishtrack"} == 0)
+          and on (job, instance)
+          (up{job="fishtrack"} == 1)
+        for: 30s
+
+        labels:
+          severity: critical
+          component: application
+
+        annotations:
+          summary: "Приложение FishTrack не готово"
+          description: "Экземпляр {{ $labels.instance }} не проходит проверку готовности. Необходимо проверить PostgreSQL."
+
+      # Обнаружение повышенной доли серверных ошибок.
+      - alert: FishTrackHighErrorRate
+        expr: |
+          (
+            (
+              sum(rate(fishtrack_http_errors_total{
+                job="fishtrack",
+                status=~"5..",
+                path!~"/health|/live|/metrics"
+              }[2m])) or vector(0)
+            )
+            /
+            sum(rate(fishtrack_http_requests_total{
+              job="fishtrack",
+              path!~"/health|/live|/metrics"
+            }[2m]))
+          ) > 0.05
+          and
+          sum(rate(fishtrack_http_requests_total{
+            job="fishtrack",
+            path!~"/health|/live|/metrics"
+          }[2m])) >= 0.1
+        for: 1m
+
+        labels:
+          severity: warning
+          component: application
+
+        annotations:
+          summary: "Повышенная доля серверных ошибок"
+          description: "Доля HTTP-ошибок 5xx превышает 5 процентов при наличии достаточной нагрузки."
+
+  # Правила обнаружения проблем инфраструктуры.
+  - name: fishtrack_infrastructure
+    interval: 10s
+
+    rules:
+      # Обнаружение высокой загрузки процессора.
+      - alert: HostHighCPU
+        expr: |
+          100 * (
+            1 - avg by (instance) (
+              rate(node_cpu_seconds_total{
+                job="node",
+                mode="idle"
+              }[2m])
+            )
+          ) > 80
+        for: 2m
+
+        labels:
+          severity: warning
+          component: infrastructure
+
+        annotations:
+          summary: "Высокая загрузка процессора"
+          description: "Загрузка CPU узла {{ $labels.instance }} превышает 80 процентов более двух минут."
+
+      # Обнаружение нехватки оперативной памяти.
+      - alert: HostHighMemory
+        expr: |
+          100 * (
+            1 -
+            node_memory_MemAvailable_bytes{job="node"}
+            /
+            node_memory_MemTotal_bytes{job="node"}
+          ) > 85
+        for: 2m
+
+        labels:
+          severity: warning
+          component: infrastructure
+
+        annotations:
+          summary: "Высокое использование оперативной памяти"
+          description: "Использование RAM узла {{ $labels.instance }} превышает 85 процентов более двух минут."

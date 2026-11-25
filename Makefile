@@ -33,8 +33,7 @@ setup:
 # RUN
 # ============================================
 run:
-	cd backend && ../venv/bin/uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-
+	cd backend && ../venv/bin/uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --no-access-log
 # ============================================
 # LINT
 # ============================================
