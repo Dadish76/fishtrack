@@ -100,3 +100,5 @@ Node Exporter и cAdvisor.
 описан в эксплуатационной инструкции:
 
 - [Инструкция диагностики и восстановления FishTrack](docs/observability-runbook.md)
+
+- [Конфигурация и развертывание системы мониторинга](monitoring/README.md)
