@@ -67,6 +67,20 @@ async def request_logging(request: Request, call_next):
     route = request.scope.get("route")
     path = getattr(route, "path", "unmatched")
 
+    allowed_methods = {
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "HEAD",
+        "OPTIONS",
+        "TRACE",
+        "CONNECT",
+    }
+
+    method = request.method if request.method in allowed_methods else "OTHER"
+
     if status_code >= 500:
         result = "server_error"
         level = logging.ERROR
@@ -83,20 +97,20 @@ async def request_logging(request: Request, call_next):
     # в статистику HTTP.
     if path != "/metrics":
         HTTP_REQUESTS.labels(
-            method=request.method,
+            method=method,
             path=path,
             status=str(status_code),
         ).inc()
 
         if status_code >= 400:
             HTTP_ERRORS.labels(
-                method=request.method,
+                method=method,
                 path=path,
                 status=str(status_code),
             ).inc()
 
         HTTP_DURATION.labels(
-            method=request.method,
+            method=method,
             path=path,
         ).observe(duration_ms / 1000.0)
 
@@ -111,7 +125,7 @@ async def request_logging(request: Request, call_next):
         "http_request",
         extra={
             "event": "http_request",
-            "method": request.method,
+            "method": method,
             "path": path,
             "status_code": status_code,
             "result": result,

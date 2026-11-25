@@ -17,6 +17,8 @@ engine = create_engine(
     connect_args=(
         {"connect_timeout": 2} if DATABASE_URL.startswith("postgresql") else {}
     ),
+    echo=False,
+    hide_parameters=True,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
