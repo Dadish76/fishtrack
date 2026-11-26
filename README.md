@@ -80,6 +80,7 @@
 
 ```bash
 make verify
+```
 
 ## Демонстрация CI/CD
 
@@ -102,3 +103,7 @@ Node Exporter и cAdvisor.
 - [Инструкция диагностики и восстановления FishTrack](docs/observability-runbook.md)
 
 - [Конфигурация и развертывание системы мониторинга](monitoring/README.md)
+
+## Серверная наблюдаемость и CI/CD
+
+Мониторинг запускается на app-server; отдельная db-server не требуется. Метрики GitHub Actions и этапов поставки доступны в отдельном Dashboard. См. [инструкцию запуска и проверки](monitoring/README.md).

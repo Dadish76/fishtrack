@@ -1,0 +1,28 @@
+groups:
+  - name: github_actions
+    interval: 30s
+    rules:
+      - alert: GitHubActionsExporterUnavailable
+        expr: up{job="github_actions"} == 0
+        for: 2m
+        labels: {severity: warning, component: cicd}
+        annotations:
+          summary: "Экспортер GitHub Actions недоступен"
+      - alert: GitHubActionsApiUnavailable
+        expr: github_actions_api_up{job="github_actions"} == 0 or (time() - github_actions_last_success_timestamp_seconds{job="github_actions"} > 360)
+        for: 3m
+        labels: {severity: warning, component: cicd}
+        annotations:
+          summary: "Не удается обновить данные GitHub Actions"
+      - alert: FishTrackPipelineFailed
+        expr: github_actions_latest_run_state{job="github_actions",state="failure"} == 1 and on(job,instance) (github_actions_api_up{job="github_actions"} == 1)
+        for: 1m
+        labels: {severity: warning, component: cicd}
+        annotations:
+          summary: "Последний запуск {{ $labels.workflow }} завершился ошибкой"
+      - alert: FishTrackDeploymentFailed
+        expr: github_actions_stage_state{job="github_actions",stage="deploy",state="failure"} == 1 and on(job,instance) (github_actions_api_up{job="github_actions"} == 1)
+        for: 1m
+        labels: {severity: critical, component: cicd}
+        annotations:
+          summary: "Последний job развертывания develop завершился ошибкой"

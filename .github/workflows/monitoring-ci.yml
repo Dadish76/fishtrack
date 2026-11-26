@@ -20,6 +20,17 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+      - name: Проверка Compose и скрипта app-server
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n monitoring/start-app-server.sh
+          export FISHTRACK_NETWORK=fishtrack-staging_internal
+          export GRAFANA_ADMIN_PASSWORD=ci-placeholder-not-a-secret
+          export GITHUB_EXPORTER_UID=10001 GITHUB_EXPORTER_GID=10001
+          export GITHUB_TOKEN_PATH="$RUNNER_TEMP/unused-token"
+          touch "$GITHUB_TOKEN_PATH"
+          docker compose -f monitoring/compose.yml config --quiet
       - name: Проверка конфигурации и правил Prometheus
         shell: bash
         run: |
@@ -32,5 +43,19 @@ jobs:
               --entrypoint /bin/promtool "$image" "$@"
           }
           promtool check config /etc/prometheus/prometheus.yml
-          promtool check rules /etc/prometheus/rules/fishtrack-alerts.yml /etc/prometheus/rules/fishtrack-fast-alerts.yml
+          promtool check rules /etc/prometheus/rules/fishtrack-alerts.yml /etc/prometheus/rules/fishtrack-fast-alerts.yml /etc/prometheus/rules/github-actions-alerts.yml
           promtool test rules /etc/prometheus/tests/fishtrack-fast-alerts.test.yml
+      - name: Тесты GitHub Actions exporter без токена и сети
+        run: python3 -m unittest discover -s monitoring/github -p 'test_*.py' -v
+      - name: Проверка JSON Dashboard
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for path in Path('monitoring/grafana/dashboards').glob('*.json'):
+              data = json.loads(path.read_text(encoding='utf-8'))
+              assert data['uid'] and data['panels'], path
+              ids = [p['id'] for p in data['panels']]
+              assert len(ids) == len(set(ids)), path
+              print(path)
+          PY

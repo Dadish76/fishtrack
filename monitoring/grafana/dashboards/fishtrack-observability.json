@@ -1,7 +1,7 @@
 {
   "id": null,
   "uid": "fishtrack-observability",
-  "title": "FishTrack Observability",
+  "title": "FishTrack Observability — app-server",
   "description": "Лабораторная работа №8: доступность, HTTP, рейсы и ресурсы FishTrack.",
   "tags": [
     "fishtrack",
@@ -10,7 +10,7 @@
   ],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "editable": false,
   "refresh": "10s",
   "time": {
@@ -41,8 +41,8 @@
         "includeAll": false,
         "options": [],
         "current": {
-          "text": "fishtrack-lab8-20261125201915",
-          "value": "fishtrack-lab8-20261125201915"
+          "text": "fishtrack-staging",
+          "value": "fishtrack-staging"
         }
       }
     ]
@@ -263,7 +263,7 @@
             "uid": "fishtrack-prometheus"
           },
           "editorMode": "code",
-          "expr": "up{job=~\"prometheus|node|cadvisor\"}",
+          "expr": "up{job=~\"prometheus|node|cadvisor|github_actions\"}",
           "legendFormat": "{{job}}",
           "range": false,
           "instant": true,
@@ -822,7 +822,7 @@
     {
       "id": 13,
       "type": "row",
-      "title": "04 · Ресурсы Linux",
+      "title": "04 · Ресурсы app-server (Linux VM)",
       "description": "",
       "gridPos": {
         "x": 0,

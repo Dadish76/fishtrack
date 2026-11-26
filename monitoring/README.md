@@ -1,163 +1,78 @@
-# Мониторинг FishTrack
+# Мониторинг FishTrack на app-server
 
-Конфигурация наблюдаемости хранится в Git. Prometheus собирает метрики приложения и инфраструктуры, Grafana отображает их, а правила Prometheus обнаруживают проблемы. Для диагностики и восстановления используется [Runbook](../docs/observability-runbook.md).
+Основной стенд наблюдаемости запускается на Ubuntu VM `app-server` вместе с существующим проектом `fishtrack-staging` (app1, app2, db, nginx). Отдельная db-server не нужна. Windows/Docker Desktop — только прежний локальный эксперимент; данные двух стендов не смешиваются. Исторические отчеты лабораторной остаются неизменными.
 
-## 1. Состав системы
+## Компоненты
 
-| Компонент | Назначение | Версия образа |
-|---|---|---|
-| Prometheus | Сбор метрик и вычисление правил | `prom/prometheus:v3.13.5` |
-| Grafana | Визуализация метрик | `grafana/grafana:13.3.2-ubuntu` |
-| Node Exporter | Метрики Linux-узла | `quay.io/prometheus/node-exporter:v1.13.1` |
-| cAdvisor | Метрики Docker-контейнеров | `ghcr.io/google/cadvisor:v0.61.1` |
+- Prometheus: 6 целей, 10 правил (6 прежних + 4 CI/CD), хранение 7 дней.
+- Grafana: Dashboard FishTrack Observability и отдельный Dashboard FishTrack CI/CD.
+- Node Exporter: CPU, RAM, файловые системы и имя Linux-хоста. Используются PID/UTS хоста и корневая файловая система app-server.
+- cAdvisor: метрики контейнеров Docker на app-server. Требуются стандартные `/var/lib/docker` и `/run/containerd/containerd.sock`; привилегированный контейнер допустим только на доверенном сервере.
+- GitHub Actions exporter: чтение REST API каждые 120 секунд, scrape каждые 30 секунд. Никакого доступа на запись в GitHub, логов workflow или секретов.
 
-Точные параметры запуска и версии задаются в `compose.yml`. Теги версий фиксированы, но не являются криптографической фиксацией образов по digest.
+## Подготовка VM
 
-## 2. Структура конфигурации
+Убедиться, что подключение выполнено к нужному app-server, Docker Engine и Compose v2 работают, staging уже запущен. На VM:
 
-```text
-monitoring/
-├── README.md
-├── compose.yml
-├── prometheus/
-│   ├── prometheus.yml
-│   └── rules/
-│       └── fishtrack-alerts.yml
-└── grafana/
-    ├── dashboards/
-    │   └── fishtrack-observability.json
-    └── provisioning/
-        ├── dashboards/
-        │   └── fishtrack.yml
-        └── datasources/
-            └── prometheus.yml
+```bash
+hostname
+hostname -I
+docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+curl -fsS http://127.0.0.1:8081/health
+curl -fsS http://127.0.0.1:8081/version
 ```
 
-Dashboard содержит 15 панелей и 18 запросов PromQL. Источник данных Prometheus имеет UID `fishtrack-prometheus`. Dashboard загружается автоматически из JSON, поэтому изменения необходимо вносить в версионируемый файл.
+Существующий `/opt/fishtrack-staging/compose.staging.yml` и `.env.staging` не перезаписываются. Если staging не работает, сначала восстановить его по существующей процедуре CD. Новый скрипт не строит образ и не изменяет БД. Для двух реплик должны быть доступны DNS-алиасы app1/app2 и `/metrics` внутри сети.
 
-## 3. Предварительные условия
+В GitHub создать fine-grained PAT для **Dadish76/fishtrack**, Repository permissions → Actions: Read-only (Metadata: Read-only автоматически). Установить срок действия. Если права на репозиторий не позволяют создать токен, его создает уполномоченный владелец. В чат и Git токен не передавать.
 
-- Docker Desktop в режиме Linux-контейнеров, Docker Compose v2 и PowerShell; команды выполняются из корня репозитория.
-- FishTrack уже развернут: `app1`, `app2`, `db` и `nginx` работают. Prometheus должен иметь доступ к `app1:8000` и `app2:8000` по общей Docker-сети.
-- Внешняя Docker-сеть приложения существует. Ее имя задается переменной `FISHTRACK_NETWORK`.
-- Пароль Grafana передается через `GRAFANA_ADMIN_PASSWORD`, а не хранится в Git.
-- Порты 9090 и 3000 свободны на локальном адресе либо заняты уже работающими контейнерами этого же проекта мониторинга.
+На VM скачать/обновить репозиторий с изменениями в отдельную папку (не `/opt/fishtrack-staging`), от обычного пользователя с доступом к Docker:
 
-## 4. Запуск локального мониторинга
+```bash
+bash monitoring/start-app-server.sh
+```
 
-Проверить Docker context и доступность демона:
+Скрипт проверяет hostname, локальный Docker socket, стандартные пути, проект и сеть, HTTP readiness и наличие метрик. Если hostname VM отличается, после проверки идентичности сервера разрешено `APP_SERVER_HOSTNAME=<фактическое-имя> bash monitoring/start-app-server.sh`. Метка `server=app-server` обозначает роль, фактическое имя проверяется через `node_uname_info`.
+
+Пароль Grafana и GitHub PAT вводятся скрыто и сохраняются в `$HOME/.config/fishtrack-monitoring/` с ограниченными правами. Пароль Grafana доступен администраторам Docker, как и раньше. Если Grafana уже инициализирована, переменная не меняет сохраненный пароль. Для смены токена обновить файл `github-actions.token` безопасным редактором и пересоздать только exporter (из того же каталога мониторинга, с теми же переменными Compose) либо повторно запустить скрипт, который пересоздает exporter. Не выводить токен в терминал.
+
+## Доступ с Windows через SSH
+
+При работающем SSH-сервере использовать отдельное окно PowerShell:
 
 ```powershell
-docker context show
-docker version
-docker network ls
+ssh -N -L 13000:127.0.0.1:3000 -L 19090:127.0.0.1:9090 -L 18081:127.0.0.1:8081 USER@VM_IP
 ```
 
-Для существующего изолированного стенда лабораторной работы имя сети — `fishtrack-lab8-20261125201915_internal`. Для нового развертывания следует выбрать фактическую сеть своего проекта.
+Заменить USER и VM_IP реальными значениями. Порты 13000/19090/18081 выбраны, чтобы не конфликтовать с локальным Docker Desktop. Окно не закрывать во время демонстрации. Мониторинг не публикуется во внешнюю сеть.
 
-```powershell
-$env:FISHTRACK_NETWORK = "fishtrack-lab8-20261125201915_internal"
-docker network inspect $env:FISHTRACK_NETWORK --format '{{.Name}}'
-```
+- FishTrack: http://127.0.0.1:18081/health
+- Grafana: http://127.0.0.1:13000/d/fishtrack-observability/fishtrack-observability
+- CI/CD: http://127.0.0.1:13000/d/fishtrack-cicd/fishtrack-cicd
+- Targets: http://127.0.0.1:19090/targets
+- Alerts: http://127.0.0.1:19090/alerts
 
-Передать пароль без его вывода в терминал:
+## Проверка источников
 
-```powershell
-$grafanaPassword = Read-Host "Введите пароль Grafana" -AsSecureString
-$env:GRAFANA_ADMIN_PASSWORD = [System.Net.NetworkCredential]::new("", $grafanaPassword).Password
-Remove-Variable grafanaPassword
-```
-
-При первом запуске пароль используется для создания администратора Grafana. При существующем томе Grafana смена переменной окружения сама по себе не меняет уже сохраненный пароль пользователя.
-
-```powershell
-function mon8 {
-    docker compose -p fishtrack-lab8-monitoring -f monitoring/compose.yml @args
-}
-
-mon8 config --quiet
-mon8 run --rm --no-deps --entrypoint /bin/promtool prometheus check config /etc/prometheus/prometheus.yml
-mon8 run --rm --no-deps --entrypoint /bin/promtool prometheus check rules /etc/prometheus/rules/fishtrack-alerts.yml
-```
-
-Только после успешных проверок и в нужном Docker context запустить мониторинг:
-
-```powershell
-mon8 up -d
-mon8 ps
-```
-
-При открытии новой сессии PowerShell временные переменные и функцию `mon8` нужно задать заново. Не использовать `docker compose down -v` для штатного обновления: эта команда удаляет именованные тома проекта.
-
-## 5. Проверка после запуска
-
-| Точка доступа | Ожидаемый результат |
-|---|---|
-| `http://127.0.0.1:9090/-/ready` | HTTP 200 |
-| `http://127.0.0.1:9090/targets` | 5 целей UP |
-| `http://127.0.0.1:9090/alerts` | 5 правил, при нормальной работе Inactive |
-| `http://127.0.0.1:3000/api/health` | HTTP 200, database: ok |
-| `http://127.0.0.1:3000/d/fishtrack-observability/fishtrack-observability` | Dashboard FishTrack Observability |
-| `http://127.0.0.1:18080/health` | HTTP 200 для текущего локального стенда |
-| `http://127.0.0.1:18080/metrics` | HTTP 404 через Nginx |
-
-В Grafana войти под пользователем `admin` с установленным паролем и выбрать фактический Compose-проект FishTrack. Проверить данные по обоим экземплярам, ресурсы узла и контейнеров, HTTP-метрики и предметную метрику.
-
-Основные запросы Prometheus:
+На app-server проверить `curl -fsS http://127.0.0.1:9090/-/ready` и `curl -fsS http://127.0.0.1:3000/api/health`. В Prometheus выполнить запросы:
 
 ```promql
-up{job="fishtrack"}
+up{server="app-server"}
+node_uname_info{job="node"}
 fishtrack_app_healthy{job="fishtrack"}
-fishtrack_trips_created_total{job="fishtrack"}
+container_memory_working_set_bytes{job="cadvisor",container_label_com_docker_compose_project="fishtrack-staging"}
+github_actions_api_up{job="github_actions"}
+github_actions_stage_state{stage="deploy"} == 1
 ```
 
-В нормальном состоянии первые два запроса возвращают по две серии со значением 1. Метрика готовности отражает последнюю проверку `/health`; наличие метрик не гарантирует готовность приложения. При отсутствии пользовательских запросов задержка и доля ошибок могут быть неопределенными.
+Ожидаются шесть целей UP, две готовые реплики, фактический nodename VM, метрики staging и API up=1. В Dashboard выбрать `fishtrack-staging`. Правила могут быть активны из-за фактического неуспешного запуска CI/CD; не считать их поломкой мониторинга. Доставка уведомлений Alertmanager не настроена.
 
-## 6. Правила обнаружения проблем
+## Метрики CI/CD: семантика
 
-| Правило | Условие | Время удержания |
-|---|---|---|
-| `FishTrackInstanceDown` | `up` равен 0 для экземпляра FishTrack | 30 с |
-| `FishTrackNotReady` | Готовность равна 0 при доступных метриках | 30 с |
-| `FishTrackHighErrorRate` | Доля 5xx выше 5% при нагрузке не менее 0,1 запроса/с | 1 мин |
-| `HostHighCPU` | CPU выше 80% | 2 мин |
-| `HostHighMemory` | Использование RAM выше 85% | 2 мин |
+`github_actions_runs_window` — число запусков по состояниям в последних 30 запусках каждого workflow (все ветки), а не накопительный счетчик. `github_actions_success_ratio` — доля success среди завершенных запусков в этом окне (включая cancelled/skipped в знаменателе). `github_actions_latest_run_duration_seconds` — приближенная длительность последнего завершенного запуска, вычисляется из run_started_at и updated_at; для текущего незавершенного запуска отсутствует. `github_actions_stage_state` — состояние конкретного job последнего push develop; `stage_duration_seconds` — длительность job по started_at/completed_at. Skipped, missing, queued и failure не являются успехом CD. Это не DORA deployment frequency или MTTR и не доказательство доступности приложения; для приемки сопоставить job, SHA и `/version` на VM. Данные появятся после успешного опроса GitHub, не мгновенно. При ошибке API снимок удаляется, api_up=0, сохраняется время последнего успешного сбора.
 
-Prometheus обнаруживает проблемы и показывает состояния Inactive, Pending и Firing. Отдельная доставка уведомлений через Alertmanager не настроена. Практически проверено правило `FishTrackNotReady` при остановке и восстановлении локальной PostgreSQL; остальные правила прошли проверку синтаксиса и вычисления.
+## Обновление и безопасность
 
-## 7. Безопасность и хранение данных
+`bash monitoring/start-app-server.sh` повторно применяет конфигурацию, не удаляя тома. При изменении файлов Prometheus после обновления проверить загрузку правил; при необходимости отправить HUP контейнеру Prometheus после `promtool check config`. При изменении GitHub exporter пересоздать только его или перезапустить соответствующий контейнер. Не использовать `down -v`, глобальную очистку томов или копирование секретов в Git.
 
-- Конфигурации, правила и Dashboard хранятся в Git; реальные пароли, токены и содержимое локальных файлов секретов — вне репозитория.
-- Prometheus и Grafana доступны через привязку портов к `127.0.0.1`. Анонимный доступ и самостоятельная регистрация в Grafana отключены. Nginx не публикует `/metrics` приложения.
-- Для Prometheus и Grafana предусмотрены именованные тома `prometheus_data` и `grafana_data`; история Prometheus хранится 7 суток. Данные этих томов не включаются в Git.
-- Экспортеры не публикуют порты на хост. cAdvisor работает в привилегированном режиме и имеет доступ к сокету Docker, что дает широкие полномочия даже при монтировании `:ro`. Допускать такой доступ следует только в доверенном окружении.
-- После завершения работы с командами Compose можно удалить пароль из текущего окружения: `Remove-Item Env:GRAFANA_ADMIN_PASSWORD`. Для следующего запуска его потребуется снова передать. Административный доступ к Docker позволяет просматривать переменные контейнеров, поэтому он должен быть ограничен.
-
-## 8. Проверка и перенос конфигурации
-
-При изменении правил выполнить `promtool check rules` и `promtool check config`. При изменении Compose выполнить `docker compose ... config --quiet`. JSON Dashboard проверять на корректность синтаксиса и наличие всех запросов PromQL; выполнение запросов и доступность источника проверять после запуска Grafana.
-
-Конфигурация протестирована локально на Docker Desktop / WSL2. Node Exporter отображает ресурсы Linux-окружения Docker, а не всего Windows-хоста. Параметр cAdvisor `--containerd=/rootfs/run/containerd/containerd.sock` соответствует проверенному локальному окружению. Перед переносом на app-server необходимо подтвердить фактические пути сокетов, наличие сети и DNS-имен `app1`/`app2`, доступность образов и правила доступа. Развертывание на app-server пока не подтверждено. При необходимости удаленного доступа к Grafana следует использовать SSH-туннель, не открывая порт мониторинга без защиты.
-
-## Лабораторная работа №8 — наблюдаемость и эксплуатация
-
-В проекте FishTrack реализованы структурированное
-логирование, сбор метрик приложения и инфраструктуры,
-визуализация в Grafana и автоматическое обнаружение проблем.
-
-Проведен выпуск функционального изменения, выполнено
-сравнение состояния локальной системы до и после выпуска,
-расследован контролируемый отказ PostgreSQL.
-
-По результатам инцидента улучшен процесс обнаружения
-проблем: время срабатывания нового правила составило
-30,129 секунды вместо 65,260 секунды.
-
-### Эксплуатационная документация
-
-- [Инструкция диагностики и восстановления](docs/observability-runbook.md)
-- [Сравнение состояния до и после выпуска](docs/release-comparison.md)
-- [Отчет об инциденте](docs/incident-postmortem.md)
-- [Улучшение процесса обнаружения проблем](docs/detection-improvement.md)
-- [Автоматические и организационные барьеры](docs/protective-barriers.md)
-- [Первичные результаты экспериментов](docs/evidence/lab8/)
+См. [Runbook](../docs/observability-runbook.md) и [исторические измерения](../docs/evidence/lab8/). Проверки CI: `.github/workflows/monitoring-ci.yml`.

@@ -1,127 +1,110 @@
-
 services:
   prometheus:
-    image: prom/prometheus:v3.13.5
+    image: localhost:5000/prometheus:v3.13.5
     restart: unless-stopped
-
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=7d"
-
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
     ports:
-      - "127.0.0.1:9090:9090"
-
+      - '127.0.0.1:9090:9090'
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/rules:/etc/prometheus/rules:ro
       - prometheus_data:/prometheus
-
-    networks:
-      - monitoring
-      - fishtrack
+    networks: [monitoring, fishtrack]
 
   grafana:
-    image: grafana/grafana:13.3.2-ubuntu
+    image: localhost:5000/grafana:13.3.2-ubuntu
     restart: unless-stopped
-
     ports:
-      - "127.0.0.1:3000:3000"
-
+      - '127.0.0.1:3000:3000'
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}"
-      GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_AUTH_ANONYMOUS_ENABLED: "false"
-
+      GF_SECURITY_ADMIN_PASSWORD: '${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
     volumes:
-      # Постоянное хранилище Grafana.
       - grafana_data:/var/lib/grafana
-
-      # Автоматическая настройка источников данных.
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-
-      # Автоматическая настройка Dashboard.
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-
-      # JSON-конфигурации панелей мониторинга.
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks: [monitoring]
+    depends_on: [prometheus]
 
-    networks:
-      - monitoring
-
-    depends_on:
-      - prometheus
-
-  # Сбор инфраструктурных метрик Linux.
+  # Метрики именно Linux-хоста app-server, а не Docker Desktop.
   node-exporter:
-    image: quay.io/prometheus/node-exporter:v1.13.1
+    image: localhost:5000/node-exporter:v1.13.1
     restart: unless-stopped
-
     pid: host
-
+    uts: host
     command:
-      - "--path.procfs=/host/proc"
-      - "--path.sysfs=/host/sys"
-      - "--path.rootfs=/rootfs"
-      - "--collector.disable-defaults"
-      - "--collector.cpu"
-      - "--collector.meminfo"
-      - "--collector.filesystem"
-      - "--collector.loadavg"
-      - "--collector.diskstats"
-      - "--collector.uname"
-
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+      - --collector.disable-defaults
+      - --collector.cpu
+      - --collector.meminfo
+      - --collector.filesystem
+      - --collector.loadavg
+      - --collector.diskstats
+      - --collector.uname
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      - /:/rootfs:ro
+      - /:/rootfs:ro,rslave
+    networks: [monitoring]
 
-    networks:
-      - monitoring
-
-
-  # Сбор метрик использования ресурсов контейнерами.
   cadvisor:
-    image: ghcr.io/google/cadvisor:v0.61.1
+    image: localhost:5000/cadvisor:v0.61.1
     restart: unless-stopped
-
     privileged: true
     cgroup: host
-
     command:
-      - "--docker_only=true"
-      - "--housekeeping_interval=10s"
-      - "--store_container_labels=false"
-      - "--whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service"
-
-      # Используем фактический сокет containerd.
-      - "--containerd=/rootfs/run/containerd/containerd.sock"
-
+      - --docker_only=true
+      - --housekeeping_interval=10s
+      - --store_container_labels=false
+      - --whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service
+      - --containerd=/rootfs/run/containerd/containerd.sock
     volumes:
       - /:/rootfs:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
+    networks: [monitoring]
 
-    networks:
-      - monitoring
-
-
+  # Отдельный процесс получает только метаданные GitHub Actions.
+  github-actions:
+    image: localhost:5000/python:3.11-slim
+    restart: unless-stopped
+    user: '${GITHUB_EXPORTER_UID:?UID required}:${GITHUB_EXPORTER_GID:?GID required}'
+    command: ['python', '-B', '/exporter/exporter.py']
+    environment:
+      PYTHONUNBUFFERED: '1'
+      GITHUB_REPOSITORY: Dadish76/fishtrack
+      GITHUB_TOKEN_FILE: /run/secrets/github_actions_token
+    volumes:
+      - ./github/exporter.py:/exporter/exporter.py:ro
+    secrets: [github_actions_token]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 128m
+    cpus: '0.25'
+    pids_limit: 32
+    networks: [monitoring]
 
 networks:
-  # Отдельная сеть системы мониторинга.
   monitoring:
     driver: bridge
-
-  # Существующая сеть приложения FishTrack.
   fishtrack:
     external: true
-    name: "${FISHTRACK_NETWORK:?FISHTRACK_NETWORK is required}"
+    name: '${FISHTRACK_NETWORK:?FISHTRACK_NETWORK is required}'
 
 volumes:
-  # Хранение истории метрик.
   prometheus_data:
-
-  # Хранение настроек и панелей Grafana.
   grafana_data:
+
+secrets:
+  github_actions_token:
+    file: '${GITHUB_TOKEN_PATH:?GITHUB_TOKEN_PATH is required}'

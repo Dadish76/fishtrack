@@ -1,56 +1,37 @@
-
 global:
-  # Периодичность сбора метрик.
   scrape_interval: 10s
-
-  # Максимальное время ожидания ответа.
   scrape_timeout: 5s
-
-  # Периодичность вычисления правил.
   evaluation_interval: 10s
+  external_labels:
+    environment: staging
+    server: app-server
 
-# Подключаем правила обнаружения проблем.
 rule_files:
-  - "/etc/prometheus/rules/*.yml"
+  - /etc/prometheus/rules/*.yml
 
 scrape_configs:
-  # Собственные метрики Prometheus.
-  - job_name: "prometheus"
+  - job_name: prometheus
     static_configs:
-      - targets:
-          - "localhost:9090"
-
-  # Метрики приложения FishTrack.
-  - job_name: "fishtrack"
-    metrics_path: "/metrics"
-
+      - targets: ['localhost:9090']
+        labels: {server: app-server}
+  - job_name: fishtrack
+    metrics_path: /metrics
     static_configs:
-      - targets:
-          - "app1:8000"
-        labels:
-          instance: "app1"
-
-      - targets:
-          - "app2:8000"
-        labels:
-          instance: "app2"
-
-  # Инфраструктурные метрики Linux.
-  - job_name: "node"
-    metrics_path: "/metrics"
-
+      - targets: ['app1:8000']
+        labels: {instance: app1, server: app-server}
+      - targets: ['app2:8000']
+        labels: {instance: app2, server: app-server}
+  - job_name: node
     static_configs:
-      - targets:
-          - "node-exporter:9100"
-        labels:
-          instance: "fishtrack-host"
-
-  # Метрики Docker-контейнеров.
-  - job_name: "cadvisor"
-    metrics_path: "/metrics"
-
+      - targets: ['node-exporter:9100']
+        labels: {instance: app-server, server: app-server}
+  - job_name: cadvisor
     static_configs:
-      - targets:
-          - "cadvisor:8080"
-        labels:
-          instance: "fishtrack-docker"
+      - targets: ['cadvisor:8080']
+        labels: {instance: app-server-docker, server: app-server}
+  # Экспортер обновляет снимок GitHub API раз в 120 секунд.
+  - job_name: github_actions
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['github-actions:9817']
+        labels: {server: app-server}
