@@ -1,5 +1,22 @@
 # FishTrack — инструкция диагностики и восстановления (Runbook)
 
+## Текущий серверный стенд (app-server)
+
+Мониторинг и приложение размещаются на одной Ubuntu VM. Команды выполняются в SSH-сессии app-server, не в Windows PowerShell. Подготовка, токен GitHub и запуск описаны в [monitoring/README.md](../monitoring/README.md). Ниже сохранена прежняя локальная инструкция и результаты локальных экспериментов; их команды не применять к VM без адаптации.
+
+```bash
+hostname
+docker ps --filter label=com.docker.compose.project=fishtrack-staging
+docker ps --filter label=com.docker.compose.project=fishtrack-server-monitoring
+curl -fsS http://127.0.0.1:8081/health
+curl -fsS http://127.0.0.1:8081/version
+curl -fsS http://127.0.0.1:9090/-/ready
+```
+
+Серверные Targets: ожидаются шесть UP; проверить `node_uname_info{job="node"}` и фактическое имя VM. В Grafana выбрать `fishtrack-staging`. Для журналов определять точные имена контейнеров по фильтру Compose-проекта и сервиса. Изменять состояние только согласованного тестового staging; при восстановлении сначала PostgreSQL, затем приложение и Nginx, после чего проверить `/health`, `/version`, `/metrics` (404) и выполнить Smoke Test. Не пересоздавать тома базы.
+
+CI/CD: проверить `github_actions_api_up` (1 при успешном опросе), `github_actions_stage_state{stage="deploy"} == 1`, соответствующий запуск GitHub Actions и фактический тег `/version`. При `GitHubActionsExporterUnavailable` проверить контейнер экспортера; при `GitHubActionsApiUnavailable` — доступ к api.github.com и права Actions: Read токена. При `FishTrackPipelineFailed` или `FishTrackDeploymentFailed` открыть соответствующий запуск в GitHub, определить упавший этап и устранить причину; не считать skipped/missing успешным выпуском. Старые локальные измерения не являются результатами серверного стенда.
+
 Лабораторная работа №8 · Этап 9
 
 ## 1. Назначение и область применения

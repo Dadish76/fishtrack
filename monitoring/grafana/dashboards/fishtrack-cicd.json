@@ -1,0 +1,567 @@
+{
+  "uid": "fishtrack-cicd",
+  "title": "FishTrack CI/CD — GitHub Actions",
+  "tags": [
+    "fishtrack",
+    "cicd",
+    "app-server"
+  ],
+  "schemaVersion": 39,
+  "version": 1,
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Доступность GitHub API",
+      "description": "1 — последний опрос успешен; 0 — ошибка, снимок не публикуется.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "github_actions_api_up",
+          "legendFormat": "API",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Возраст данных GitHub",
+      "description": "Время с последнего успешного опроса.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "time() - (github_actions_last_success_timestamp_seconds > 0)",
+          "legendFormat": "Возраст",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Последние запуски CI",
+      "description": "Последний запуск каждого workflow по номеру; все ветки.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (workflow) (0 * github_actions_latest_run_state{state=\"missing\"} or 1 * github_actions_latest_run_state{state=\"success\"} or 2 * github_actions_latest_run_state{state=\"failure\"} or 3 * github_actions_latest_run_state{state=\"cancelled\"} or 4 * github_actions_latest_run_state{state=\"skipped\"} or 5 * github_actions_latest_run_state{state=\"queued\"} or 6 * github_actions_latest_run_state{state=\"in_progress\"} or 7 * github_actions_latest_run_state{state=\"other\"})",
+          "legendFormat": "{{workflow}}",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "MISSING",
+                  "color": "gray",
+                  "index": 0
+                },
+                "1": {
+                  "text": "SUCCESS",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "FAILURE",
+                  "color": "red",
+                  "index": 2
+                },
+                "3": {
+                  "text": "CANCELLED",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "SKIPPED",
+                  "color": "gray",
+                  "index": 4
+                },
+                "5": {
+                  "text": "QUEUED",
+                  "color": "yellow",
+                  "index": 5
+                },
+                "6": {
+                  "text": "IN_PROGRESS",
+                  "color": "blue",
+                  "index": 6
+                },
+                "7": {
+                  "text": "OTHER",
+                  "color": "gray",
+                  "index": 7
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Успешность завершенных запусков",
+      "description": "Доля success среди завершенных запусков из последних 30; это не счетчик за период.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * github_actions_success_ratio",
+          "legendFormat": "{{workflow}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Запуски в последнем окне",
+      "description": "До 30 запусков на workflow, текущий снимок.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "github_actions_runs_window",
+          "legendFormat": "{{workflow}} / {{state}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Длительность последнего завершенного запуска",
+      "description": "Приближение run_started_at → updated_at; текущий незавершенный запуск не имеет длительности.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "github_actions_latest_run_duration_seconds",
+          "legendFormat": "{{workflow}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Номер последнего push develop",
+      "description": "FishTrack CI: только push develop.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "github_actions_develop_run_number",
+          "legendFormat": "Run #",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 8,
+      "title": "Этапы последнего push develop",
+      "description": "Публикация и deploy — отдельные job; skipped/missing не успех.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (stage) (0 * github_actions_stage_state{state=\"missing\"} or 1 * github_actions_stage_state{state=\"success\"} or 2 * github_actions_stage_state{state=\"failure\"} or 3 * github_actions_stage_state{state=\"cancelled\"} or 4 * github_actions_stage_state{state=\"skipped\"} or 5 * github_actions_stage_state{state=\"queued\"} or 6 * github_actions_stage_state{state=\"in_progress\"} or 7 * github_actions_stage_state{state=\"other\"})",
+          "legendFormat": "{{stage}}",
+          "instant": true,
+          "range": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "MISSING",
+                  "color": "gray",
+                  "index": 0
+                },
+                "1": {
+                  "text": "SUCCESS",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "FAILURE",
+                  "color": "red",
+                  "index": 2
+                },
+                "3": {
+                  "text": "CANCELLED",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "SKIPPED",
+                  "color": "gray",
+                  "index": 4
+                },
+                "5": {
+                  "text": "QUEUED",
+                  "color": "yellow",
+                  "index": 5
+                },
+                "6": {
+                  "text": "IN_PROGRESS",
+                  "color": "blue",
+                  "index": 6
+                },
+                "7": {
+                  "text": "OTHER",
+                  "color": "gray",
+                  "index": 7
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 9,
+      "title": "Длительность этапов CI/CD",
+      "description": "Только завершенные job с корректными временными метками.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fishtrack-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "github_actions_stage_duration_seconds",
+          "legendFormat": "{{stage}}",
+          "instant": false,
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fishtrack-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    }
+  ]
+}
