@@ -1,6 +1,6 @@
 services:
   prometheus:
-    image: prom/prometheus:v3.13.5
+    image: localhost:5000/prometheus:v3.13.5
     restart: unless-stopped
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -15,7 +15,7 @@ services:
     networks: [monitoring, fishtrack]
 
   grafana:
-    image: grafana/grafana:13.3.2-ubuntu
+    image: localhost:5000/grafana:13.3.2-ubuntu
     restart: unless-stopped
     ports:
       - '127.0.0.1:3000:3000'
@@ -34,7 +34,7 @@ services:
 
   # Метрики именно Linux-хоста app-server, а не Docker Desktop.
   node-exporter:
-    image: quay.io/prometheus/node-exporter:v1.13.1
+    image: localhost:5000/node-exporter:v1.13.1
     restart: unless-stopped
     pid: host
     uts: host
@@ -56,7 +56,7 @@ services:
     networks: [monitoring]
 
   cadvisor:
-    image: ghcr.io/google/cadvisor:v0.61.1
+    image: localhost:5000/cadvisor:v0.61.1
     restart: unless-stopped
     privileged: true
     cgroup: host
@@ -75,7 +75,7 @@ services:
 
   # Отдельный процесс получает только метаданные GitHub Actions.
   github-actions:
-    image: python:3.11-slim
+    image: localhost:5000/python:3.11-slim
     restart: unless-stopped
     user: '${GITHUB_EXPORTER_UID:?UID required}:${GITHUB_EXPORTER_GID:?GID required}'
     command: ['python', '-B', '/exporter/exporter.py']
